@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import '../../../../core/routing/app_router.dart';
 import '../../../../core/shared/widgets/pyago_avatar.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../auth/presentation/providers/auth_provider.dart';
@@ -66,7 +67,10 @@ class ProfileScreen extends ConsumerWidget {
                           ),
                         ),
                         const Spacer(),
-                        OutlinedButton(onPressed: () {}, child: const Text('Edit profile')),
+                        OutlinedButton(
+                          onPressed: () => context.push('/complete-profile'),
+                          child: const Text('Edit profile'),
+                        ),
                       ],
                     ),
                   ),

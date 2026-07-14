@@ -90,7 +90,12 @@ class SettingsScreen extends ConsumerWidget {
           _SettingsGroup(
             title: 'Account',
             children: [
-              ListTile(contentPadding: EdgeInsets.zero, title: const Text('Privacy'), trailing: const Icon(Icons.chevron_right_rounded), onTap: () {}),
+              ListTile(
+                contentPadding: EdgeInsets.zero,
+                title: const Text('Privacy'),
+                trailing: const Icon(Icons.chevron_right_rounded),
+                onTap: () => _showComingSoon(context, 'Privacy Settings'),
+              ),
               Consumer(builder: (context, ref, _) {
                 final biometric = ref.watch(biometricServiceProvider);
                 return FutureBuilder<bool>(
@@ -121,20 +126,40 @@ class SettingsScreen extends ConsumerWidget {
                   },
                 );
               }),
-              ListTile(contentPadding: EdgeInsets.zero, title: const Text('Notifications'), trailing: const Icon(Icons.chevron_right_rounded), onTap: () {}),
-              ListTile(contentPadding: EdgeInsets.zero, title: const Text('Storage & downloads'), trailing: const Icon(Icons.chevron_right_rounded), onTap: () {}),
+              ListTile(
+                contentPadding: EdgeInsets.zero,
+                title: const Text('Notifications'),
+                trailing: const Icon(Icons.chevron_right_rounded),
+                onTap: () => context.push('/notifications'),
+              ),
+              ListTile(
+                contentPadding: EdgeInsets.zero,
+                title: const Text('Storage & downloads'),
+                trailing: const Icon(Icons.chevron_right_rounded),
+                onTap: () => _showComingSoon(context, 'Storage Management'),
+              ),
             ],
           ),
           _SettingsGroup(
             title: 'Support',
             children: [
-              ListTile(contentPadding: EdgeInsets.zero, title: const Text('Help center'), trailing: const Icon(Icons.chevron_right_rounded), onTap: () {}),
-              ListTile(contentPadding: EdgeInsets.zero, title: const Text('Send feedback'), trailing: const Icon(Icons.chevron_right_rounded), onTap: () {}),
+              ListTile(
+                contentPadding: EdgeInsets.zero,
+                title: const Text('Help center'),
+                trailing: const Icon(Icons.chevron_right_rounded),
+                onTap: () => _showComingSoon(context, 'Help Center'),
+              ),
+              ListTile(
+                contentPadding: EdgeInsets.zero,
+                title: const Text('Send feedback'),
+                trailing: const Icon(Icons.chevron_right_rounded),
+                onTap: () => _showComingSoon(context, 'Feedback'),
+              ),
               ListTile(
                 contentPadding: EdgeInsets.zero,
                 title: const Text('About Pyago'),
                 subtitle: const Text('${AppConstants.appName} · v0.1.0'),
-                onTap: () {},
+                onTap: () => _showComingSoon(context, 'About Pyago'),
               ),
             ],
           ),
@@ -149,6 +174,12 @@ class SettingsScreen extends ConsumerWidget {
           const SizedBox(height: AppSpacing.xxxl),
         ],
       ),
+    );
+  }
+
+  void _showComingSoon(BuildContext context, String feature) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text('$feature is coming soon!')),
     );
   }
 
