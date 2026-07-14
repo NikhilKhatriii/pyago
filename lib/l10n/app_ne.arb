@@ -1,0 +1,66 @@
+{
+  "@@locale": "ne",
+
+  "appName": "प्यागो",
+  "appTagline": "तपाईंले भन्न चाहनुभएको कुराको लागि एक शान्त ठाउँ।",
+
+  "navHome": "गृहपृष्ठ",
+  "navExplore": "अन्वेषण",
+  "navCreate": "सिर्जना गर्नुहोस्",
+  "navCommunities": "समुदायहरू",
+  "navProfile": "प्रोफाइल",
+
+  "actionCancel": "रद्द गर्नुहोस्",
+  "actionSave": "सुरक्षित गर्नुहोस्",
+  "actionRetry": "पुनः प्रयास गर्नुहोस्",
+  "actionPublish": "प्रकाशित गर्नुहोस्",
+  "actionSignIn": "साइन इन गर्नुहोस्",
+  "actionSignOut": "साइन आउट गर्नुहोस्",
+  "actionSend": "पठाउनुहोस्",
+  "actionShowMore": "थप देखाउनुहोस्",
+  "actionUnlock": "अनलक गर्नुहोस्",
+
+  "feedTitleToday": "आजका लागि",
+  "feedSeeAll": "सबै हेर्नुहोस्",
+  "feedCaughtUpTitle": "तपाईं आजका लागि अद्यावधिक हुनुहुन्छ",
+  "feedCaughtUpBody": "प्यागोले जानाजान थोरै-थोरै देखाउँछ। भोलि थप सामग्री यहाँ आउनेछ।",
+  "feedCaughtUpLoadAnyway": "जे भए पनि थोरै थप देखाउनुहोस्",
+  "feedEmptyTitle": "अहिलेसम्म केही क्युरेट गरिएको छैन",
+  "feedEmptyBody": "केही लेखक वा समुदायहरूलाई फलो गर्नुहोस्, यो ठाउँ भरिन थाल्नेछ।",
+  "offlineBanner": "तपाईं अफलाइन हुनुहुन्छ — सुरक्षित सामग्री देखाइँदैछ।",
+  "willPublishWhenOnline": "फेरि अनलाइन हुँदा प्रकाशित हुनेछ",
+
+  "commentsEmptyTitle": "अहिलेसम्म कुनै विचार छैन",
+  "commentsEmptyBody": "यो लेखाइले तपाईंलाई के महसुस गरायो, सबैभन्दा पहिले साझा गर्नुहोस्।",
+  "commentsHint": "आफ्नो विचार साझा गर्नुहोस्…",
+
+  "chatEmptyTitle": "अहिलेसम्म कुनै कुराकानी छैन",
+  "chatEmptyBody": "कसैको प्रोफाइलबाट कुराकानी सुरु गर्नुहोस्।",
+  "chatMessageHint": "सन्देश…",
+  "chatIsTyping": "{name} टाइप गर्दैछन्…",
+
+  "settingsTitle": "सेटिङहरू",
+  "settingsAppearance": "देखावट",
+  "settingsTheme": "थिम",
+  "settingsHighContrast": "उच्च कन्ट्रास्ट",
+  "settingsTextSize": "अक्षर साइज",
+  "settingsLanguage": "एपको भाषा",
+  "settingsAppLock": "एप लक",
+  "settingsAppLockSubtitleOn": "प्यागो खोल्न बायोमेट्रिक्स वा डिभाइस PIN आवश्यक पर्छ",
+  "settingsAppLockSubtitleUnsupported": "यो डिभाइसमा उपलब्ध छैन",
+
+  "appLockScreenTitle": "प्यागो लक गरिएको छ",
+  "appLockScreenBody": "जारी राख्न बायोमेट्रिक्स वा तपाईंको डिभाइस PIN प्रयोग गरेर अनलक गर्नुहोस्।",
+
+  "errorGeneric": "अनपेक्षित समस्या भयो।",
+  "errorOffline": "तपाईं अफलाइन हुनुहुन्छ। सुरक्षित सामग्री देखाइँदैछ।",
+  "errorTimeout": "यसमा धेरै समय लाग्यो। फेरि प्रयास गर्नुहोस्।",
+  "errorServer": "प्यागोमा अहिले समस्या भइरहेको छ। फेरि प्रयास गर्नुहोस्।",
+  "errorSessionExpired": "तपाईंको सत्र समाप्त भयो। कृपया फेरि साइन इन गर्नुहोस्।",
+
+  "draftsEmptyTitle": "कुनै ड्राफ्ट सुरक्षित छैन",
+  "draftsEmptyBody": "तपाईंले लेख्न सुरु गरेर सुरक्षित गर्नुभएको जुनसुकै कुरा यहाँ देखिनेछ — अफलाइन हुँदा पनि।",
+  "draftsStartWriting": "लेख्न सुरु गर्नुहोस्",
+  "bookmarksEmptyTitle": "अहिलेसम्म कुनै बुकमार्क छैन",
+  "bookmarksEmptyBody": "फेरि फर्किन चाहनुभएको जुनसुकैमा बुकमार्क आइकनमा ट्याप गर्नुहोस् — अफलाइनमा पनि उपलब्ध।"
+}

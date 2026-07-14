@@ -1,0 +1,66 @@
+{
+  "@@locale": "ja",
+
+  "appName": "Pyago",
+  "appTagline": "あなたの言葉のための静かな場所。",
+
+  "navHome": "ホーム",
+  "navExplore": "見つける",
+  "navCreate": "作成",
+  "navCommunities": "コミュニティ",
+  "navProfile": "プロフィール",
+
+  "actionCancel": "キャンセル",
+  "actionSave": "保存",
+  "actionRetry": "再試行",
+  "actionPublish": "公開する",
+  "actionSignIn": "サインイン",
+  "actionSignOut": "サインアウト",
+  "actionSend": "送信",
+  "actionShowMore": "もっと見る",
+  "actionUnlock": "ロック解除",
+
+  "feedTitleToday": "今日のおすすめ",
+  "feedSeeAll": "すべて見る",
+  "feedCaughtUpTitle": "今日はここまでです",
+  "feedCaughtUpBody": "Pyagoはあえて少しずつ表示しています。続きはまた明日。",
+  "feedCaughtUpLoadAnyway": "それでももう少し見る",
+  "feedEmptyTitle": "まだ表示できる投稿がありません",
+  "feedEmptyBody": "作家やコミュニティをフォローすると、ここが少しずつ埋まっていきます。",
+  "offlineBanner": "オフラインです — 保存済みの内容を表示しています。",
+  "willPublishWhenOnline": "オンラインに戻ったら公開されます",
+
+  "commentsEmptyTitle": "まだ感想がありません",
+  "commentsEmptyBody": "この作品から感じたことを、最初にシェアしてみませんか。",
+  "commentsHint": "感想を書く…",
+
+  "chatEmptyTitle": "会話はまだありません",
+  "chatEmptyBody": "誰かのプロフィールから会話を始めましょう。",
+  "chatMessageHint": "メッセージ…",
+  "chatIsTyping": "{name}さんが入力中…",
+
+  "settingsTitle": "設定",
+  "settingsAppearance": "外観",
+  "settingsTheme": "テーマ",
+  "settingsHighContrast": "ハイコントラスト",
+  "settingsTextSize": "文字サイズ",
+  "settingsLanguage": "アプリの言語",
+  "settingsAppLock": "アプリロック",
+  "settingsAppLockSubtitleOn": "Pyagoを開くには生体認証または端末のPINが必要です",
+  "settingsAppLockSubtitleUnsupported": "この端末では利用できません",
+
+  "appLockScreenTitle": "Pyagoはロックされています",
+  "appLockScreenBody": "続けるには生体認証または端末のPINでロックを解除してください。",
+
+  "errorGeneric": "予期しない問題が発生しました。",
+  "errorOffline": "オフラインです。保存済みの内容を表示しています。",
+  "errorTimeout": "時間がかかりすぎました。もう一度お試しください。",
+  "errorServer": "Pyagoに一時的な問題が発生しています。もう一度お試しください。",
+  "errorSessionExpired": "セッションの有効期限が切れました。再度サインインしてください。",
+
+  "draftsEmptyTitle": "保存された下書きはありません",
+  "draftsEmptyBody": "書き始めて保存したものはここに表示されます — オフラインでも。",
+  "draftsStartWriting": "書き始める",
+  "bookmarksEmptyTitle": "まだブックマークがありません",
+  "bookmarksEmptyBody": "また戻ってきたいものにブックマークアイコンをタップしてください — オフラインでも利用できます。"
+}

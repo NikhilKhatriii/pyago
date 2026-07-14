@@ -1,0 +1,66 @@
+{
+  "@@locale": "ar",
+
+  "appName": "بياغو",
+  "appTagline": "مكان هادئ لما تريد أن تقوله.",
+
+  "navHome": "الرئيسية",
+  "navExplore": "استكشف",
+  "navCreate": "إنشاء",
+  "navCommunities": "المجتمعات",
+  "navProfile": "الملف الشخصي",
+
+  "actionCancel": "إلغاء",
+  "actionSave": "حفظ",
+  "actionRetry": "إعادة المحاولة",
+  "actionPublish": "نشر",
+  "actionSignIn": "تسجيل الدخول",
+  "actionSignOut": "تسجيل الخروج",
+  "actionSend": "إرسال",
+  "actionShowMore": "عرض المزيد",
+  "actionUnlock": "فتح القفل",
+
+  "feedTitleToday": "لهذا اليوم",
+  "feedSeeAll": "عرض الكل",
+  "feedCaughtUpTitle": "لقد اطّلعت على كل شيء لهذا اليوم",
+  "feedCaughtUpBody": "يعرض بياغو القليل في كل مرة عن قصد. سيتوفر المزيد غدًا.",
+  "feedCaughtUpLoadAnyway": "عرض المزيد على أي حال",
+  "feedEmptyTitle": "لا يوجد محتوى مُختار بعد",
+  "feedEmptyBody": "تابع بعض الكتّاب أو المجتمعات وستبدأ هذه المساحة بالامتلاء.",
+  "offlineBanner": "أنت غير متصل بالإنترنت — يتم عرض المحتوى المحفوظ.",
+  "willPublishWhenOnline": "سيُنشر عند عودة الاتصال بالإنترنت",
+
+  "commentsEmptyTitle": "لا توجد آراء بعد",
+  "commentsEmptyBody": "كن أول من يشارك ما أثاره هذا النص لديك.",
+  "commentsHint": "شارك فكرة…",
+
+  "chatEmptyTitle": "لا توجد محادثات بعد",
+  "chatEmptyBody": "ابدأ محادثة من الملف الشخصي لأحدهم.",
+  "chatMessageHint": "رسالة…",
+  "chatIsTyping": "‏{name} يكتب الآن…",
+
+  "settingsTitle": "الإعدادات",
+  "settingsAppearance": "المظهر",
+  "settingsTheme": "السمة",
+  "settingsHighContrast": "تباين عالٍ",
+  "settingsTextSize": "حجم النص",
+  "settingsLanguage": "لغة التطبيق",
+  "settingsAppLock": "قفل التطبيق",
+  "settingsAppLockSubtitleOn": "يتطلب فتح بياغو بصمة أو رقم PIN الخاص بالجهاز",
+  "settingsAppLockSubtitleUnsupported": "غير متاح على هذا الجهاز",
+
+  "appLockScreenTitle": "بياغو مقفل",
+  "appLockScreenBody": "افتح القفل باستخدام البصمة أو رقم PIN الخاص بجهازك للمتابعة.",
+
+  "errorGeneric": "حدث خطأ غير متوقع.",
+  "errorOffline": "أنت غير متصل بالإنترنت. يتم عرض المحتوى المحفوظ.",
+  "errorTimeout": "استغرق هذا وقتًا طويلاً. يرجى المحاولة مرة أخرى.",
+  "errorServer": "يواجه بياغو مشكلة الآن. يرجى المحاولة مرة أخرى.",
+  "errorSessionExpired": "انتهت صلاحية جلستك. يرجى تسجيل الدخول مرة أخرى.",
+
+  "draftsEmptyTitle": "لا توجد مسودات محفوظة",
+  "draftsEmptyBody": "كل ما تبدأ في كتابته وحفظه سيظهر هنا — حتى دون اتصال بالإنترنت.",
+  "draftsStartWriting": "ابدأ الكتابة",
+  "bookmarksEmptyTitle": "لا توجد إشارات مرجعية بعد",
+  "bookmarksEmptyBody": "اضغط على أيقونة الإشارة المرجعية على أي شيء تريد العودة إليه — متاح أيضًا دون اتصال."
+}

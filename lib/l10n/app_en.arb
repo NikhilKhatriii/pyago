@@ -1,0 +1,66 @@
+{
+  "@@locale": "en",
+
+  "appName": "Pyago",
+  "appTagline": "A quiet place for what you have to say.",
+
+  "navHome": "Home",
+  "navExplore": "Explore",
+  "navCreate": "Create",
+  "navCommunities": "Communities",
+  "navProfile": "Profile",
+
+  "actionCancel": "Cancel",
+  "actionSave": "Save",
+  "actionRetry": "Retry",
+  "actionPublish": "Publish",
+  "actionSignIn": "Sign in",
+  "actionSignOut": "Sign out",
+  "actionSend": "Send",
+  "actionShowMore": "Show more",
+  "actionUnlock": "Unlock",
+
+  "feedTitleToday": "For today",
+  "feedSeeAll": "See all",
+  "feedCaughtUpTitle": "You're caught up for today",
+  "feedCaughtUpBody": "Pyago shows a little at a time on purpose. More will be here tomorrow.",
+  "feedCaughtUpLoadAnyway": "Show a bit more anyway",
+  "feedEmptyTitle": "Nothing curated yet",
+  "feedEmptyBody": "Follow a few writers or communities and this space will start to fill up.",
+  "offlineBanner": "You're offline — showing saved content.",
+  "willPublishWhenOnline": "Will publish when you're back online",
+
+  "commentsEmptyTitle": "No thoughts yet",
+  "commentsEmptyBody": "Be the first to share what this piece brought up for you.",
+  "commentsHint": "Share a thought…",
+
+  "chatEmptyTitle": "No conversations yet",
+  "chatEmptyBody": "Start a conversation from someone's profile.",
+  "chatMessageHint": "Message…",
+  "chatIsTyping": "{name} is typing…",
+
+  "settingsTitle": "Settings",
+  "settingsAppearance": "Appearance",
+  "settingsTheme": "Theme",
+  "settingsHighContrast": "High contrast",
+  "settingsTextSize": "Text size",
+  "settingsLanguage": "App language",
+  "settingsAppLock": "App lock",
+  "settingsAppLockSubtitleOn": "Require biometrics or device PIN to open Pyago",
+  "settingsAppLockSubtitleUnsupported": "Not available on this device",
+
+  "appLockScreenTitle": "Pyago is locked",
+  "appLockScreenBody": "Unlock with biometrics or your device PIN to continue.",
+
+  "errorGeneric": "Something unexpected happened.",
+  "errorOffline": "You're offline. Showing saved content.",
+  "errorTimeout": "That took too long. Please try again.",
+  "errorServer": "Pyago is having trouble right now. Please try again.",
+  "errorSessionExpired": "Your session has expired. Please sign in again.",
+
+  "draftsEmptyTitle": "No drafts saved",
+  "draftsEmptyBody": "Anything you start writing and save will show up here — even offline.",
+  "draftsStartWriting": "Start writing",
+  "bookmarksEmptyTitle": "No bookmarks yet",
+  "bookmarksEmptyBody": "Tap the bookmark icon on anything you want to come back to — available offline too."
+}

@@ -1,0 +1,94 @@
+name: pyago
+description: "Pyago — a platform for meaningful human expression."
+publish_to: 'none'
+version: 0.1.0+1
+
+environment:
+  sdk: '>=3.4.0 <4.0.0'
+
+dependencies:
+  flutter:
+    sdk: flutter
+  flutter_localizations:
+    sdk: flutter
+  cupertino_icons: ^1.0.8
+
+  # State management
+  flutter_riverpod: ^2.5.1
+  riverpod_annotation: ^2.3.5
+
+  # Navigation
+  go_router: ^14.2.0
+
+  # Design / Animation
+  google_fonts: ^6.2.1
+  flutter_animate: ^4.5.0
+
+  # Storage
+  shared_preferences: ^2.2.3
+  flutter_secure_storage: ^9.2.2
+  hive: ^2.2.3
+  hive_flutter: ^1.1.0
+  path_provider: ^2.1.4
+
+  # Networking
+  dio: ^5.4.3+1
+  connectivity_plus: ^6.0.5
+
+  # Media
+  image_picker: ^1.1.2
+  file_picker: ^8.0.6
+  video_player: ^2.9.1
+  record: ^5.1.0
+  audioplayers: ^6.0.0
+
+  # Rich text / markdown
+  flutter_markdown: ^0.7.3
+
+  # Security
+  local_auth: ^2.3.0
+
+  # Real-time transport (used behind a Stream<Message> abstraction;
+  # dev/mock flavor fakes it locally, see lib/core/network/realtime)
+  web_socket_channel: ^2.4.0
+
+  # Push notification hooks (foreground/background handling scaffolding;
+  # inert in dev/mock flavor until Firebase project files are added)
+  flutter_local_notifications: ^17.2.2
+
+  # Utilities
+  intl: ^0.20.2
+  equatable: ^2.0.5
+  uuid: ^4.4.2
+  cached_network_image: ^3.4.1
+  shimmer: ^3.0.0
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  integration_test:
+    sdk: flutter
+  flutter_lints: ^4.0.0
+  riverpod_generator: ^2.4.0
+  build_runner: ^2.4.11
+  custom_lint: ^0.6.4
+  riverpod_lint: ^2.3.10
+  mocktail: ^1.0.4
+  golden_toolkit: ^0.15.0
+
+flutter:
+  uses-material-design: true
+  generate: true
+
+  assets:
+    - assets/images/
+    - assets/icons/
+
+  # Fonts are loaded via google_fonts at runtime; a local fallback
+  # font family is declared here for offline builds.
+  # fonts:
+  #   - family: PyagoSans
+  #     fonts:
+  #       - asset: assets/fonts/PyagoSans-Regular.ttf
+  #       - asset: assets/fonts/PyagoSans-Bold.ttf
+  #         weight: 700

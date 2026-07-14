@@ -1,0 +1,66 @@
+{
+  "@@locale": "fr",
+
+  "appName": "Pyago",
+  "appTagline": "Un endroit calme pour ce que vous avez à dire.",
+
+  "navHome": "Accueil",
+  "navExplore": "Explorer",
+  "navCreate": "Créer",
+  "navCommunities": "Communautés",
+  "navProfile": "Profil",
+
+  "actionCancel": "Annuler",
+  "actionSave": "Enregistrer",
+  "actionRetry": "Réessayer",
+  "actionPublish": "Publier",
+  "actionSignIn": "Se connecter",
+  "actionSignOut": "Se déconnecter",
+  "actionSend": "Envoyer",
+  "actionShowMore": "Voir plus",
+  "actionUnlock": "Déverrouiller",
+
+  "feedTitleToday": "Pour aujourd'hui",
+  "feedSeeAll": "Tout voir",
+  "feedCaughtUpTitle": "Vous êtes à jour pour aujourd'hui",
+  "feedCaughtUpBody": "Pyago affiche volontairement peu de contenu à la fois. Il y en aura plus demain.",
+  "feedCaughtUpLoadAnyway": "Afficher un peu plus quand même",
+  "feedEmptyTitle": "Rien n'a encore été sélectionné",
+  "feedEmptyBody": "Suivez quelques auteurs ou communautés, cet espace commencera à se remplir.",
+  "offlineBanner": "Vous êtes hors ligne — contenu enregistré affiché.",
+  "willPublishWhenOnline": "Sera publié dès que vous serez de nouveau en ligne",
+
+  "commentsEmptyTitle": "Aucune réaction pour l'instant",
+  "commentsEmptyBody": "Soyez le premier à partager ce que ce texte vous a inspiré.",
+  "commentsHint": "Partagez une pensée…",
+
+  "chatEmptyTitle": "Aucune conversation pour l'instant",
+  "chatEmptyBody": "Démarrez une conversation depuis le profil de quelqu'un.",
+  "chatMessageHint": "Message…",
+  "chatIsTyping": "{name} est en train d'écrire…",
+
+  "settingsTitle": "Paramètres",
+  "settingsAppearance": "Apparence",
+  "settingsTheme": "Thème",
+  "settingsHighContrast": "Contraste élevé",
+  "settingsTextSize": "Taille du texte",
+  "settingsLanguage": "Langue de l'application",
+  "settingsAppLock": "Verrouillage de l'application",
+  "settingsAppLockSubtitleOn": "Biométrie ou code PIN de l'appareil requis pour ouvrir Pyago",
+  "settingsAppLockSubtitleUnsupported": "Non disponible sur cet appareil",
+
+  "appLockScreenTitle": "Pyago est verrouillé",
+  "appLockScreenBody": "Déverrouillez avec la biométrie ou le code PIN de votre appareil pour continuer.",
+
+  "errorGeneric": "Une erreur inattendue s'est produite.",
+  "errorOffline": "Vous êtes hors ligne. Contenu enregistré affiché.",
+  "errorTimeout": "Cela a pris trop de temps. Veuillez réessayer.",
+  "errorServer": "Pyago rencontre des difficultés en ce moment. Veuillez réessayer.",
+  "errorSessionExpired": "Votre session a expiré. Veuillez vous reconnecter.",
+
+  "draftsEmptyTitle": "Aucun brouillon enregistré",
+  "draftsEmptyBody": "Tout ce que vous commencez à écrire et enregistrez apparaîtra ici — même hors ligne.",
+  "draftsStartWriting": "Commencer à écrire",
+  "bookmarksEmptyTitle": "Aucun favori pour l'instant",
+  "bookmarksEmptyBody": "Appuyez sur l'icône favori pour tout ce à quoi vous voulez revenir — disponible aussi hors ligne."
+}

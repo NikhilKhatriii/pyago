@@ -1,0 +1,66 @@
+{
+  "@@locale": "hi",
+
+  "appName": "प्यागो",
+  "appTagline": "आपकी बात कहने के लिए एक शांत जगह।",
+
+  "navHome": "होम",
+  "navExplore": "एक्सप्लोर",
+  "navCreate": "बनाएँ",
+  "navCommunities": "समुदाय",
+  "navProfile": "प्रोफ़ाइल",
+
+  "actionCancel": "रद्द करें",
+  "actionSave": "सहेजें",
+  "actionRetry": "पुनः प्रयास करें",
+  "actionPublish": "प्रकाशित करें",
+  "actionSignIn": "साइन इन करें",
+  "actionSignOut": "साइन आउट करें",
+  "actionSend": "भेजें",
+  "actionShowMore": "और दिखाएँ",
+  "actionUnlock": "अनलॉक करें",
+
+  "feedTitleToday": "आज के लिए",
+  "feedSeeAll": "सभी देखें",
+  "feedCaughtUpTitle": "आप आज के लिए अपडेट हैं",
+  "feedCaughtUpBody": "प्यागो जानबूझकर थोड़ा-थोड़ा दिखाता है। कल और सामग्री यहाँ होगी।",
+  "feedCaughtUpLoadAnyway": "फिर भी थोड़ा और दिखाएँ",
+  "feedEmptyTitle": "अभी तक कुछ भी क्यूरेट नहीं किया गया",
+  "feedEmptyBody": "कुछ लेखकों या समुदायों को फॉलो करें, यह जगह भरने लगेगी।",
+  "offlineBanner": "आप ऑफ़लाइन हैं — सहेजी गई सामग्री दिखाई जा रही है।",
+  "willPublishWhenOnline": "फिर से ऑनलाइन होने पर प्रकाशित होगा",
+
+  "commentsEmptyTitle": "अभी तक कोई विचार नहीं",
+  "commentsEmptyBody": "इस लेख ने आपके मन में क्या ख्याल जगाया, सबसे पहले साझा करें।",
+  "commentsHint": "एक विचार साझा करें…",
+
+  "chatEmptyTitle": "अभी तक कोई बातचीत नहीं",
+  "chatEmptyBody": "किसी की प्रोफ़ाइल से बातचीत शुरू करें।",
+  "chatMessageHint": "संदेश…",
+  "chatIsTyping": "{name} टाइप कर रहे हैं…",
+
+  "settingsTitle": "सेटिंग्स",
+  "settingsAppearance": "दिखावट",
+  "settingsTheme": "थीम",
+  "settingsHighContrast": "उच्च कंट्रास्ट",
+  "settingsTextSize": "टेक्स्ट आकार",
+  "settingsLanguage": "ऐप की भाषा",
+  "settingsAppLock": "ऐप लॉक",
+  "settingsAppLockSubtitleOn": "प्यागो खोलने के लिए बायोमेट्रिक्स या डिवाइस पिन आवश्यक",
+  "settingsAppLockSubtitleUnsupported": "इस डिवाइस पर उपलब्ध नहीं है",
+
+  "appLockScreenTitle": "प्यागो लॉक है",
+  "appLockScreenBody": "जारी रखने के लिए बायोमेट्रिक्स या अपने डिवाइस पिन से अनलॉक करें।",
+
+  "errorGeneric": "कुछ अप्रत्याशित हुआ।",
+  "errorOffline": "आप ऑफ़लाइन हैं। सहेजी गई सामग्री दिखाई जा रही है।",
+  "errorTimeout": "इसमें बहुत समय लग गया। कृपया फिर से प्रयास करें।",
+  "errorServer": "प्यागो को अभी परेशानी हो रही है। कृपया फिर से प्रयास करें।",
+  "errorSessionExpired": "आपका सत्र समाप्त हो गया है। कृपया फिर से साइन इन करें।",
+
+  "draftsEmptyTitle": "कोई ड्राफ़्ट सहेजा नहीं गया",
+  "draftsEmptyBody": "आपने जो कुछ भी लिखना शुरू करके सहेजा है, वह यहाँ दिखेगा — ऑफ़लाइन होने पर भी।",
+  "draftsStartWriting": "लिखना शुरू करें",
+  "bookmarksEmptyTitle": "अभी तक कोई बुकमार्क नहीं",
+  "bookmarksEmptyBody": "जिस चीज़ पर वापस आना चाहते हैं उस पर बुकमार्क आइकन टैप करें — ऑफ़लाइन में भी उपलब्ध।"
+}
