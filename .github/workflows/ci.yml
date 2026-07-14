@@ -51,7 +51,7 @@ jobs:
           CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
 
       - name: Upload coverage artifact (fallback)
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: coverage-report
           path: coverage/lcov.info
@@ -87,7 +87,7 @@ jobs:
         run: flutter build apk --debug --dart-define=PYAGO_FLAVOR=dev
 
       - name: Upload debug APK
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: pyago-debug-apk
           path: build/app/outputs/flutter-apk/app-debug.apk
