@@ -1,0 +1,37 @@
+# Lefthook configuration
+# https://github.com/evilmartians/lefthook
+#
+# Install: lefthook install
+# These hooks run automatically on every git commit.
+# They mirror exactly what CI enforces, so you fix issues locally
+# instead of waiting for a CI failure after push.
+
+pre-commit:
+  parallel: true
+  commands:
+    format:
+      glob: "*.dart"
+      run: dart format --set-exit-if-changed {staged_files}
+      fail_text: |
+        ❌ dart format found unformatted files.
+        Run: dart format .
+        Then stage the changes and commit again.
+
+    analyze:
+      run: flutter analyze --fatal-infos --no-pub
+      fail_text: |
+        ❌ flutter analyze found issues.
+        Fix the listed errors/warnings, then commit again.
+
+commit-msg:
+  commands:
+    conventional:
+      run: |
+        MSG=$(cat {1})
+        if ! echo "$MSG" | grep -qE "^(feat|fix|docs|style|refactor|perf|test|chore|ci|build|revert)(\(.+\))?: .{1,100}"; then
+          echo "❌ Commit message must follow Conventional Commits:"
+          echo "   <type>(<scope>): <description>"
+          echo "   Types: feat fix docs style refactor perf test chore ci build revert"
+          echo "   Example: feat(feed): add session-cap caught-up notice"
+          exit 1
+        fi

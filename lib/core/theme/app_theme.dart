@@ -21,6 +21,11 @@ class AppTheme {
         textSecondary:
             highContrast ? AppColors.highContrastLightText : AppColors.lightTextSecondary,
         primary: AppColors.brandPrimary,
+        // Light theme: tertiary is a warm amber, used for the offline banner
+        tertiary: AppColors.warning,
+        onTertiary: Colors.white,
+        tertiaryContainer: AppColors.warning.withValues(alpha: 0.12),
+        onTertiaryContainer: const Color(0xFF7A4800),
         highContrast: highContrast,
       );
 
@@ -36,6 +41,11 @@ class AppTheme {
         textSecondary:
             highContrast ? AppColors.highContrastDarkText : AppColors.darkTextSecondary,
         primary: AppColors.brandPrimaryLight,
+        // Dark theme: tertiary is a muted amber so it reads well on dark surfaces
+        tertiary: AppColors.warning,
+        onTertiary: AppColors.darkBackground,
+        tertiaryContainer: AppColors.warning.withValues(alpha: 0.18),
+        onTertiaryContainer: const Color(0xFFFFDDB3),
         highContrast: highContrast,
       );
 
@@ -48,6 +58,10 @@ class AppTheme {
     required Color textPrimary,
     required Color textSecondary,
     required Color primary,
+    required Color tertiary,
+    required Color onTertiary,
+    required Color tertiaryContainer,
+    required Color onTertiaryContainer,
     required bool highContrast,
   }) {
     final colorScheme = ColorScheme(
@@ -56,6 +70,10 @@ class AppTheme {
       onPrimary: Colors.white,
       secondary: AppColors.brandAccent,
       onSecondary: Colors.white,
+      tertiary: tertiary,
+      onTertiary: onTertiary,
+      tertiaryContainer: tertiaryContainer,
+      onTertiaryContainer: onTertiaryContainer,
       error: AppColors.error,
       onError: Colors.white,
       surface: surface,

@@ -1,0 +1,43 @@
+{
+  // Pre-configured launch profiles for all three Pyago flavors.
+  // Select a profile from the Run & Debug panel (Ctrl+Shift+D / Cmd+Shift+D).
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "name": "Pyago (dev)",
+      "request": "launch",
+      "type": "dart",
+      "flutterMode": "debug",
+      "args": [
+        "--dart-define-from-file=.dart_defines/dev.json"
+      ]
+    },
+    {
+      "name": "Pyago (dev — profile)",
+      "request": "launch",
+      "type": "dart",
+      "flutterMode": "profile",
+      "args": [
+        "--dart-define-from-file=.dart_defines/dev.json"
+      ]
+    },
+    {
+      "name": "Pyago (staging)",
+      "request": "launch",
+      "type": "dart",
+      "flutterMode": "debug",
+      "args": [
+        "--dart-define-from-file=.dart_defines/staging.json"
+      ]
+    },
+    {
+      "name": "Pyago (production — release)",
+      "request": "launch",
+      "type": "dart",
+      "flutterMode": "release",
+      "args": [
+        "--dart-define-from-file=.dart_defines/production.json"
+      ]
+    }
+  ]
+}

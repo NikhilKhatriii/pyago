@@ -1,15 +1,17 @@
+import 'dart:async';
+
 import 'package:dio/dio.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import '../config/app_config.dart';
-import '../errors/app_exception.dart';
-import '../storage/secure_token_storage.dart';
-import 'connectivity_service.dart';
-import 'interceptors/auth_interceptor.dart';
-import 'interceptors/error_mapper.dart';
-import 'interceptors/logging_interceptor.dart';
-import 'interceptors/retry_interceptor.dart';
-import 'result.dart';
+import 'package:pyago/core/config/app_config.dart';
+import 'package:pyago/core/errors/app_exception.dart';
+import 'package:pyago/core/network/connectivity_service.dart';
+import 'package:pyago/core/network/interceptors/auth_interceptor.dart';
+import 'package:pyago/core/network/interceptors/error_mapper.dart';
+import 'package:pyago/core/network/interceptors/logging_interceptor.dart';
+import 'package:pyago/core/network/interceptors/retry_interceptor.dart';
+import 'package:pyago/core/network/result.dart';
+import 'package:pyago/core/storage/secure_token_storage.dart';
 
 /// Thin, typed wrapper around [Dio]. Every real repository implementation
 /// (the ones used once [AppConfig.useMockData] is false) goes through
@@ -106,7 +108,7 @@ class ApiClient {
       );
 
   Future<Result<T>> _wrap<T>(
-    Future<Response> Function() request,
+    Future<Response<dynamic>> Function() request,
     T Function(dynamic data) parse,
   ) async {
     try {
@@ -122,22 +124,45 @@ class ApiClient {
 }
 
 final apiClientProvider = Provider<ApiClient>((ref) {
+  final notifier = ref.watch(sessionExpiredNotifierProvider.notifier);
   return ApiClient(
     config: AppConfig.current,
     tokenStorage: ref.watch(secureTokenStorageProvider),
     connectivity: ref.watch(connectivityServiceProvider),
-    onSessionExpired: () async {
-      // Reaches into auth at call time to avoid a circular provider
-      // dependency; auth_provider.dart listens on this via
-      // `sessionExpiredNotifierProvider` (see auth_provider.dart).
-      ref.read(sessionExpiredSignalProvider.notifier).state++;
-    },
+    onSessionExpired: () async => notifier.signal(),
   );
 });
 
-/// Bumped whenever the auth interceptor force-logs-out due to an
-/// unrecoverable session expiry. `AuthController` listens to this and
-/// clears its state — kept as a tiny counter provider (rather than a
-/// direct method call) specifically to avoid `api_client.dart` and
-/// `auth_provider.dart` importing each other.
-final sessionExpiredSignalProvider = StateProvider<int>((ref) => 0);
+// ── Session-expiry signalling ────────────────────────────────────────────────
+
+/// Emitted by [SessionExpiredNotifier] whenever the auth interceptor
+/// force-logs out due to an unrecoverable token refresh failure.
+///
+/// `AuthController` listens to [sessionExpiredNotifierProvider] via
+/// `ref.listen` and clears its state accordingly. Using a typed
+/// [AsyncNotifier] instead of the former `StateProvider<int>` counter
+/// means the signal is self-documenting and can carry a payload in the
+/// future (e.g. a reason code) without a breaking change.
+class SessionExpiredNotifier extends AsyncNotifier<void> {
+  late final StreamController<void> _controller;
+
+  @override
+  Future<void> build() async {
+    _controller = StreamController<void>.broadcast();
+    ref.onDispose(_controller.close);
+  }
+
+  /// Fire the session-expired signal. Called exclusively by [ApiClient]'s
+  /// `onSessionExpired` callback; never call this from UI code.
+  void signal() {
+    if (!_controller.isClosed) _controller.add(null);
+  }
+
+  /// Stream that [AuthController] subscribes to.
+  Stream<void> get events => _controller.stream;
+}
+
+final sessionExpiredNotifierProvider =
+    AsyncNotifierProvider<SessionExpiredNotifier, void>(
+  SessionExpiredNotifier.new,
+);

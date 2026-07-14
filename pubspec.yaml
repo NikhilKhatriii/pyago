@@ -1,7 +1,7 @@
 name: pyago
 description: "Pyago — a platform for meaningful human expression."
 publish_to: 'none'
-version: 0.1.0+1
+version: 0.2.0+1
 
 environment:
   sdk: '>=3.4.0 <4.0.0'
@@ -56,6 +56,11 @@ dependencies:
   # inert in dev/mock flavor until Firebase project files are added)
   flutter_local_notifications: ^17.2.2
 
+  # Model code generation (freezed + json_serializable)
+  # Run: dart run build_runner build --delete-conflicting-outputs
+  freezed_annotation: ^2.4.1
+  json_annotation: ^4.9.0
+
   # Utilities
   intl: ^0.20.2
   equatable: ^2.0.5
@@ -69,12 +74,27 @@ dev_dependencies:
   integration_test:
     sdk: flutter
   flutter_lints: ^4.0.0
+
+  # Code generation
   riverpod_generator: ^2.4.0
   build_runner: ^2.4.11
-  custom_lint: ^0.6.4
-  riverpod_lint: ^2.3.10
+  freezed: ^2.5.2
+  json_serializable: ^6.8.0
+
+  # Lint
+  custom_lint: ^0.7.3
+  riverpod_lint: ^2.4.3
+
+  # Testing
   mocktail: ^1.0.4
   golden_toolkit: ^0.15.0
+
+  # App icon + splash screen generation
+  # Run after adding icon assets:
+  #   dart run flutter_launcher_icons
+  #   dart run flutter_native_splash:create
+  flutter_launcher_icons: ^0.14.1
+  flutter_native_splash: ^2.4.1
 
 flutter:
   uses-material-design: true
@@ -84,11 +104,53 @@ flutter:
     - assets/images/
     - assets/icons/
 
-  # Fonts are loaded via google_fonts at runtime; a local fallback
-  # font family is declared here for offline builds.
+  # Inter is loaded via google_fonts at runtime.
+  # The local embedding below is the offline fallback — ensures correct
+  # typography even without network access on first launch.
+  # Download Inter from https://fonts.google.com/specimen/Inter and place
+  # the TTF files in assets/fonts/ to activate this section.
+  #
   # fonts:
-  #   - family: PyagoSans
+  #   - family: Inter
   #     fonts:
-  #       - asset: assets/fonts/PyagoSans-Regular.ttf
-  #       - asset: assets/fonts/PyagoSans-Bold.ttf
+  #       - asset: assets/fonts/Inter-Regular.ttf
+  #         weight: 400
+  #       - asset: assets/fonts/Inter-Medium.ttf
+  #         weight: 500
+  #       - asset: assets/fonts/Inter-SemiBold.ttf
+  #         weight: 600
+  #       - asset: assets/fonts/Inter-Bold.ttf
   #         weight: 700
+  #   - family: Merriweather
+  #     fonts:
+  #       - asset: assets/fonts/Merriweather-Regular.ttf
+  #         weight: 400
+  #       - asset: assets/fonts/Merriweather-Bold.ttf
+  #         weight: 700
+
+# ── flutter_launcher_icons configuration ─────────────────────────────────────
+flutter_launcher_icons:
+  android: true
+  ios: true
+  image_path: "assets/icons/app_icon.png"
+  min_sdk_android: 21
+  adaptive_icon_background: "#5B4EF2"
+  adaptive_icon_foreground: "assets/icons/app_icon.png"
+  remove_alpha_ios: true
+  web:
+    generate: false
+
+# ── flutter_native_splash configuration ──────────────────────────────────────
+flutter_native_splash:
+  color: "#5B4EF2"
+  image: "assets/icons/app_icon.png"
+  color_dark: "#0E0D12"
+  image_dark: "assets/icons/app_icon.png"
+  android: true
+  ios: true
+  android_12:
+    image: "assets/icons/app_icon.png"
+    color: "#5B4EF2"
+    image_dark: "assets/icons/app_icon.png"
+    color_dark: "#0E0D12"
+  fullscreen: false

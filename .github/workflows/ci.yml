@@ -6,85 +6,131 @@ on:
   pull_request:
     branches: [main, develop]
 
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
+  # ── Job 1: Static analysis, formatting, and unit/widget tests ─────────────
   analyze_and_test:
-    name: Analyze, format, and test
+    name: Analyze, format & test
     runs-on: ubuntu-latest
+
     steps:
       - uses: actions/checkout@v4
 
       - uses: subosito/flutter-action@v2
         with:
-          flutter-version: '3.24.0'
-          channel: 'stable'
+          flutter-version-file: pubspec.yaml   # reads sdk constraint floor
+          channel: stable
           cache: true
 
       - name: Install dependencies
         run: flutter pub get
 
+      - name: Run code generator
+        run: dart run build_runner build --delete-conflicting-outputs
+
       - name: Verify formatting
         run: dart format --output=none --set-exit-if-changed .
 
-      - name: Analyze
+      - name: Analyze (fatal infos)
         run: flutter analyze --fatal-infos
 
       - name: Run unit & widget tests
-        run: flutter test --coverage
+        run: flutter test --coverage --reporter=github
 
-      - name: Upload coverage
+      - name: Upload coverage to Codecov
+        uses: codecov/codecov-action@v4
+        with:
+          files: coverage/lcov.info
+          flags: unittests
+          name: pyago-coverage
+          fail_ci_if_error: false   # don't fail CI for a Codecov network hiccup
+        env:
+          CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
+
+      - name: Upload coverage artifact (fallback)
         uses: actions/upload-artifact@v4
         with:
           name: coverage-report
           path: coverage/lcov.info
+          retention-days: 14
 
+  # ── Job 2: Debug APK build (Android) ─────────────────────────────────────
   build_debug_android:
-    name: Debug APK build
+    name: Debug APK (Android)
     needs: analyze_and_test
     runs-on: ubuntu-latest
+
     steps:
       - uses: actions/checkout@v4
 
       - uses: subosito/flutter-action@v2
         with:
-          flutter-version: '3.24.0'
-          channel: 'stable'
+          flutter-version-file: pubspec.yaml
+          channel: stable
           cache: true
 
       - uses: actions/setup-java@v4
         with:
-          distribution: 'temurin'
+          distribution: temurin
           java-version: '17'
 
       - name: Install dependencies
         run: flutter pub get
 
-      - name: Build debug APK
-        run: flutter build apk --debug
+      - name: Run code generator
+        run: dart run build_runner build --delete-conflicting-outputs
 
-      - name: Upload APK
+      - name: Build debug APK
+        run: flutter build apk --debug --dart-define=PYAGO_FLAVOR=dev
+
+      - name: Upload debug APK
         uses: actions/upload-artifact@v4
         with:
           name: pyago-debug-apk
           path: build/app/outputs/flutter-apk/app-debug.apk
+          retention-days: 7
 
+  # ── Job 3: Integration tests ──────────────────────────────────────────────
   integration_test:
-    name: Integration test (critical path)
+    name: Integration tests
     needs: analyze_and_test
     runs-on: macos-latest
+
     steps:
       - uses: actions/checkout@v4
 
       - uses: subosito/flutter-action@v2
         with:
-          flutter-version: '3.24.0'
-          channel: 'stable'
+          flutter-version-file: pubspec.yaml
+          channel: stable
           cache: true
 
       - name: Install dependencies
         run: flutter pub get
 
-      - name: Run integration tests on iOS Simulator
+      - name: Run code generator
+        run: dart run build_runner build --delete-conflicting-outputs
+
+      - name: Boot iOS simulator
         run: |
-          flutter emulators || true
-          flutter test integration_test/app_test.dart -d "iPhone 15" || \
-          echo "No simulator available in this runner image; see README for local run instructions."
+          UDID=$(xcrun simctl list devices available --json \
+            | python3 -c "
+          import sys, json
+          devs = json.load(sys.stdin)['devices']
+          iphones = [d for runtimes in devs.values() for d in runtimes
+                     if 'iPhone' in d.get('name','') and d.get('isAvailable')]
+          iphones.sort(key=lambda d: d['name'], reverse=True)
+          print(iphones[0]['udid'] if iphones else '')
+          ")
+          if [ -z "$UDID" ]; then
+            echo "::error::No available iPhone simulator found. Cannot run integration tests."
+            exit 1
+          fi
+          echo "SIMULATOR_UDID=$UDID" >> "$GITHUB_ENV"
+          xcrun simctl boot "$UDID" || true
+
+      - name: Run integration tests
+        run: flutter test integration_test/app_test.dart -d "$SIMULATOR_UDID"

@@ -3,18 +3,21 @@ import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-import 'core/constants/app_constants.dart';
-import 'core/routing/app_router.dart';
-import 'core/services/app_lock_gate.dart';
-import 'core/services/push_notification_service.dart';
-import 'core/storage/hive_service.dart';
-import 'core/storage/local_storage_service.dart';
-import 'core/theme/app_theme.dart';
-import 'features/settings/presentation/providers/settings_provider.dart';
-import 'l10n/app_localizations.dart';
+import 'package:pyago/core/constants/app_constants.dart';
+import 'package:pyago/core/routing/app_router.dart';
+import 'package:pyago/core/services/app_lock_gate.dart';
+import 'package:pyago/core/services/crash_reporting_service.dart';
+import 'package:pyago/core/services/push_notification_service.dart';
+import 'package:pyago/core/storage/hive_service.dart';
+import 'package:pyago/core/storage/local_storage_service.dart';
+import 'package:pyago/core/theme/app_theme.dart';
+import 'package:pyago/features/settings/presentation/providers/settings_provider.dart';
+import 'package:pyago/l10n/app_localizations.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
+
+  // Initialise storage before the widget tree is built.
   final prefs = await SharedPreferences.getInstance();
   await HiveService.init();
 
@@ -23,6 +26,11 @@ Future<void> main() async {
       overrides: [
         localStorageProvider.overrideWithValue(LocalStorageService(prefs)),
         hiveServiceProvider.overrideWithValue(HiveService()),
+        // Swap the no-op implementation for a real one in staging/production:
+        //
+        // crashReportingServiceProvider.overrideWithValue(
+        //   SentryCrashReportingService(),
+        // ),
       ],
       child: const PyagoApp(),
     ),
@@ -36,7 +44,8 @@ class PyagoApp extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final router = ref.watch(appRouterProvider);
     final settings = ref.watch(settingsControllerProvider);
-    // Reading this once here is enough to initialize the plugin and
+
+    // Reading this once here is enough to initialise the plugin and
     // register the notification-tap → deep-link handler for the
     // lifetime of the app.
     ref.watch(pushNotificationServiceProvider);

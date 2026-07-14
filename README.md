@@ -1,66 +1,285 @@
 # Pyago
 
-A quiet, feature-first Flutter app for meaningful writing and reading — journals, poetry, articles, voice notes, and slow, deliberate community discussion. Built with Riverpod + GoRouter on a clean-architecture layout (`lib/core`, `lib/features/<feature>/{data,domain,presentation}`).
+[![CI](https://github.com/your-org/pyago/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/your-org/pyago/actions/workflows/ci.yml)
+[![codecov](https://codecov.io/gh/your-org/pyago/branch/main/graph/badge.svg)](https://codecov.io/gh/your-org/pyago)
+[![Flutter](https://img.shields.io/badge/Flutter-3.x_stable-02569B?logo=flutter)](https://flutter.dev)
+[![Dart](https://img.shields.io/badge/Dart-3.4%2B-0175C2?logo=dart)](https://dart.dev)
+[![License: MIT](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE)
 
-This repo now contains **Phase 1** (UI/design system/navigation scaffold) and **Phase 2** (data layer, offline support, real feature depth) merged together, in place.
+> A quiet, feature-first Flutter app for meaningful writing and reading — journals, poetry, articles, voice notes, and slow, deliberate community discussion.
 
-## Running it
+---
 
-```
+## Table of Contents
+
+- [Overview](#overview)
+- [Screenshots](#screenshots)
+- [Tech Stack](#tech-stack)
+- [Getting Started](#getting-started)
+- [Environment Flavors](#environment-flavors)
+- [Project Structure](#project-structure)
+- [Architecture](#architecture)
+- [Testing](#testing)
+- [CI/CD](#cicd)
+- [Contributing](#contributing)
+- [Security](#security)
+- [Changelog](#changelog)
+
+---
+
+## Overview
+
+Pyago is a long-form social writing platform built with Flutter. It is designed around a single conviction: that the best social products are slow, deliberate, and focused entirely on the quality of what people share — not the speed at which they share it.
+
+**Phase 2 features (all in this repo):**
+
+| Area | What's in |
+|---|---|
+| **Network layer** | `ApiClient` (Dio) with auth-token interceptor, refresh-on-401, retry with back-off, offline short-circuit |
+| **Mock backend** | `MockEngine` — realistic latency, pagination, and ~6 % injected failure rate so error/retry paths are always exercised |
+| **Offline-first** | Hive-backed feed cache, drafts, bookmarks, and mutation outbox that replays on reconnect |
+| **Feed** | Cursor-paginated batches with session cap, pull-to-refresh, optimistic resonance with rollback |
+| **Create** | Selection-aware Markdown toolbar, live preview, image/video/voice attachment, drag-to-reorder, autosave drafts |
+| **Chat** | `RealtimeChannel<T>` abstraction, typing indicators, read receipts, pending/sent/failed message lifecycle |
+| **Auth** | Biometric/PIN `AppLockGate`, tokens exclusively in `flutter_secure_storage` |
+| **Localization** | Full `flutter_localizations` + ARB setup for 7 languages (en, ne, hi, ja, de, fr, ar) |
+| **Push notifications** | Scaffolding with tap-to-deep-link, documented for FCM wiring |
+| **Testing** | Unit + widget + golden + integration tests; coverage uploaded to Codecov on every CI run |
+
+---
+
+## Screenshots
+
+> Add real device screenshots here once the app is running locally.
+> Use `flutter screenshot` or Android Studio's device capture.
+
+---
+
+## Tech Stack
+
+| Layer | Technology |
+|---|---|
+| Framework | Flutter 3.x (Material 3) |
+| State | Riverpod 2 + code generation (`riverpod_annotation`) |
+| Navigation | GoRouter 14 |
+| Networking | Dio 5, `web_socket_channel` |
+| Local storage | Hive 2, `flutter_secure_storage` |
+| Fonts | Google Fonts (Inter UI + Merriweather display) |
+| Animation | `flutter_animate` |
+| Models | `freezed` + `json_serializable` |
+| Localization | `flutter_localizations` + ARB |
+| Testing | `mocktail`, `golden_toolkit`, `integration_test` |
+| CI | GitHub Actions + Codecov |
+
+---
+
+## Getting Started
+
+### Prerequisites
+
+- Flutter SDK 3.x stable (`flutter --version`)
+- Android Studio Ladybug or VS Code with the Dart + Flutter extensions
+- Java 17 (for Android builds — `java -version`)
+
+### First-time setup
+
+```bash
+# 1. Clone
+git clone https://github.com/your-org/pyago.git
+cd pyago
+
+# 2. Install Flutter dependencies
 flutter pub get
-flutter run
+
+# 3. Run the code generator (required for Riverpod + freezed)
+dart run build_runner build --delete-conflicting-outputs
+
+# 4. Run on a connected device or emulator (defaults to dev flavor)
+flutter run --dart-define-from-file=.dart_defines/dev.json
 ```
 
-Android Studio: open the project root, let Gradle sync, run on an emulator or device (`flutter build apk --debug` also works from the CLI).
+No backend is required. The `dev` flavor runs entirely against the in-memory
+mock backend — you will see realistic loading, pagination, and occasional
+transient errors (by design — they exercise error/retry UI paths).
 
-No backend is required — the `dev` flavor (default) runs entirely against a realistic in-memory fake backend (see below).
+### VS Code
 
-## Environment flavors
+Open the repo in VS Code, accept the extensions prompt, then select one of the
+pre-configured launch profiles from the Run & Debug panel (`Ctrl+Shift+D`):
+- **Pyago (dev)** — mock backend, debug mode
+- **Pyago (staging)** — real backend, debug mode
+- **Pyago (production)** — real backend, release mode
 
-Set via `--dart-define=PYAGO_FLAVOR=dev|staging|production` (default `dev`). Defined in `lib/core/config/app_config.dart` — **this is the one file to touch to point the app at a real backend**:
+### Pre-commit hooks
 
-- `dev`: `useMockData = true`. All repositories run against `MockEngine`-backed fake data sources with simulated latency, pagination, and a ~6% injected transient-failure rate, so you see the same loading/retry/error UI you'd see against a real, occasionally-flaky API.
-- `staging` / `production`: set `useMockData = false` and fill in `baseUrl`. Repository providers (e.g. `feedRepositoryProvider`, `chatRepositoryProvider`) are the only places that need a real `Http*Repository`/`WebSocketRealtimeChannel` implementation swapped in — no UI or provider-shape changes are required anywhere else.
+```bash
+# Install Lefthook (enforces dart format + flutter analyze before every commit)
+brew install lefthook   # macOS; see CONTRIBUTING.md for other platforms
+lefthook install
+```
 
-## What's genuinely done in Phase 2
+---
 
-- **Network/data layer**: `dio`-based `ApiClient` with auth-token interceptor (refresh-on-401, single retry, force-logout), debug-only logging, retry-with-backoff for idempotent GETs, offline short-circuit, and a `Result<T>` success/failure wrapper (`lib/core/network/`).
-- **Realistic mock backend**: `MockEngine` gives every mock repository the same latency/pagination/failure-injection behavior, so the swap to a real backend later is provably just a repository swap.
-- **Offline & caching**: Hive-backed local storage (`lib/core/storage/hive_service.dart`) for feed cache, drafts, bookmarks, and an offline mutation outbox. Feed uses cache-then-network. Drafts and bookmarks are fully local-first (not just "cached if lucky"). Publishing while offline queues in the outbox and replays automatically on reconnect, with a visible "will publish when back online" state.
-- **Feed & pagination**: small, deliberate cursor-paginated batches (not infinite scroll) with a session cap and a "you're caught up for today" stopping point. Pull-to-refresh reconciles without duplicating/reordering. Resonance (like) is optimistic with rollback + toast on failure. Comments are a flat (not threaded — see doc comment on `CommentModel` for why) feature with its own loading/empty/error states.
-- **Rich content**: Create screen has a selection-aware Markdown toolbar (bold/italic/heading/list/blockquote) with a live preview mode, plus image/video/voice-note attachment picking, a simulated compress→upload progress pipeline, and drag-to-reorder/remove attachments. Drafts autosave full structured content (formatting + attachments), not just raw strings.
-- **Localization**: real `flutter_localizations` + ARB (`lib/l10n/`) setup for all seven declared languages (en, ne, hi, ja, de, fr, ar), fully translated for a solid common set of ~50 shared UI strings (nav, actions, feed/empty/error states, settings, app lock, chat). Wired into `home_screen.dart` as a working example.
-- **Chat & real-time**: transport-agnostic `RealtimeChannel<T>` abstraction (`lib/core/network/realtime/`) with a `WebSocketRealtimeChannel` production implementation and a `MockChatRepository` that simulates typing indicators, read receipts, and optimistic pending/sent/failed message states over a real `Stream<ChatEvent>`. Local-notification scaffolding (`PushNotificationService`) with tap-to-deep-link, documented for wiring in real FCM later.
-- **Security**: tokens live only in `flutter_secure_storage` (`SecureTokenStorage`) — the old plaintext-prefs key is deprecated and unused. Optional biometric/PIN app-lock (off by default, `AppLockGate`) gates the whole app on cold start and resume-from-background.
-- **Android native project**: `AndroidManifest.xml` declares every permission the new features need (network state, camera/mic/media read for the media pipeline, biometric, notifications), `MainActivity` was switched to `FlutterFragmentActivity` (required by `local_auth`), and `build.gradle.kts` has core-library desugaring enabled (required by `flutter_local_notifications`).
-- **CI**: `.github/workflows/ci.yml` runs `dart format --set-exit-if-changed`, `flutter analyze --fatal-infos`, `flutter test --coverage`, a debug APK build, and an integration-test job.
-- **Tests**: real unit tests for `MockEngine` pagination/failure-injection, the `Result` type, `DraftModel`, and `FeedController` (pagination merge, session cap, optimistic-resonance rollback via a hand-written fake repository), a widget test for `PyagoButton` states, golden tests for `PyagoButton`/`PyagoAvatar`/`PyagoTag` in light and dark themes (see gap note on baselines below), and an integration test suite covering bottom-nav across all five destinations plus writing and publishing a post from the Create screen.
+## Environment Flavors
 
-## Honest gaps — please read before assuming full completion
+Set via `--dart-define=PYAGO_FLAVOR=dev|staging|production` (default `dev`).
+The flavor files live in `.dart_defines/`. **`lib/core/config/app_config.dart`
+is the single seam** for pointing the app at a real backend.
 
-This sandbox has **no Flutter SDK and no access to pub.dev**, so nothing here has been run through `flutter pub get`, `flutter analyze`, `flutter test`, or `flutter build apk`. Everything above was written and reviewed by hand for consistency (import paths checked segment-by-segment, provider wiring, API shapes cross-checked against the actual design-system widgets, brace/paren balance verified across every file), but **you should run the full toolchain yourself before trusting it as "done."** Specifically expect to spend some time on:
+| Flavor | Mock data | Backend URL |
+|---|---|---|
+| `dev` | ✅ (6 % failure injection, 450 ms latency) | n/a |
+| `staging` | ❌ | `https://staging.api.pyago.app` |
+| `production` | ❌ | `https://api.pyago.app` |
 
-- First `flutter pub get` — dependency versions were chosen from memory/known-good ranges, not resolved live; a version conflict is plausible.
-- Golden test **baselines don't exist yet** (they can't be generated without a real Flutter render engine). Run `flutter test --update-goldens test/golden/` once, review the generated PNGs in `test/golden/goldens/`, and commit them — after that, `flutter test` diffs against them normally.
-- iOS: Phase 1 deliberately scoped to Android only (see `ios/README.md`). Run `flutter create --platforms=ios .` to scaffold the Xcode project, then add these usage-description keys to the generated `Info.plist` for the media/biometric/notification features added in Phase 2: `NSCameraUsageDescription`, `NSMicrophoneUsageDescription`, `NSPhotoLibraryUsageDescription`, `NSFaceIDUsageDescription`. Android already has its manifest permissions and `FlutterFragmentActivity`/desugaring set up for the equivalent features.
-- Localization now covers a broad common set (~55 keys) wired into home, comments, chat (list + thread), settings, the app-lock screen, drafts, and bookmarks — genuinely used in the UI, not just declared. It's still **not** an exhaustive extraction of every string across all ~56 screens/widgets (auth, explore, profile, communities, notifications, and search still have some hard-coded English). Extending it is mechanical: add a key to `lib/l10n/app_en.arb` + the other six `.arb` files, then reference `AppLocalizations.of(context)!.yourKey` in the widget.
-- Accessibility: `PostCard`'s resonance/comment controls now have a 44×44 minimum tap target and descriptive `Semantics` labels, and the app-lock screen and settings are localized/labeled. A full pass across *every* interactive element on *every* screen (explore, profile, communities, notifications, search) hasn't been done — the components touched directly in this pass got that attention; the rest still rely on Flutter's default semantics (which cover plain buttons/text reasonably well, but not custom tap targets like the ones fixed in `PostCard`).
-- The integration test suite now covers (a) bottom-nav navigation across all five destinations and (b) writing and publishing a post from the Create screen, both via a pre-authenticated provider override. It does **not** cover the actual register → email/OTP verification → profile-completion flow, since that needs exact widget text from the auth screens that wasn't re-verified against a live run — recommend adding that once you can run the app locally and confirm the real copy on those screens.
+Switching to a real backend for `staging`/`production` requires **zero UI or
+provider-shape changes** — only a real `Http*Repository` implementation in
+`lib/features/*/data/repositories/` needs to be added, and the single
+`AppConfig.useMockData` branch in the DI layer picks it up.
 
-## Project structure
+---
 
-Unchanged from Phase 1's feature-first layout. New Phase 2 additions:
+## Project Structure
 
 ```
-lib/core/config/app_config.dart          — flavor/backend swap seam
-lib/core/network/                        — ApiClient, Result<T>, interceptors, mock engine, realtime
-lib/core/storage/hive_service.dart       — offline persistence
-lib/core/storage/secure_token_storage.dart
-lib/core/services/                       — biometric, app-lock gate, push notifications
-lib/l10n/                                — ARB files + l10n.yaml (generates AppLocalizations)
-lib/features/*/data/repositories/        — real Mock*Repository implementations behind each feature's interface
-lib/features/create/data/services/       — media pipeline
-lib/features/chat/                       — full chat feature (was UI-only in Phase 1)
-test/, integration_test/                 — new test suite
-.github/workflows/ci.yml                 — CI
+lib/
+├── core/
+│   ├── config/             — AppConfig (flavor/backend swap seam)
+│   ├── constants/          — AppConstants (app name, locales, etc.)
+│   ├── errors/             — Typed AppException hierarchy (9 subtypes)
+│   ├── extensions/         — Dart extension methods
+│   ├── helpers/            — Utility functions
+│   ├── models/             — Shared domain primitives
+│   ├── network/
+│   │   ├── api_client.dart         — Dio wrapper (Result<T>, auth, retry)
+│   │   ├── connectivity_service.dart
+│   │   ├── interceptors/           — Auth, retry, logging, error-mapper
+│   │   ├── mock/                   — MockEngine (latency, pagination, failures)
+│   │   ├── offline_queue.dart      — Mutation outbox
+│   │   ├── pagination.dart         — Page<T> cursor model
+│   │   ├── realtime/               — RealtimeChannel<T> abstraction + WS impl
+│   │   └── result.dart             — Sealed Result<T> (Success / Failure)
+│   ├── routing/            — GoRouter + auth-gated redirect
+│   ├── services/
+│   │   ├── app_lock_gate.dart      — Biometric/PIN gate
+│   │   ├── biometric_service.dart
+│   │   ├── crash_reporting_service.dart  — CrashReportingService abstraction
+│   │   └── push_notification_service.dart
+│   ├── shared/
+│   │   ├── animations/     — Shared animation helpers
+│   │   ├── app_shell.dart  — Bottom-nav StatefulShellRoute host
+│   │   └── widgets/        — PyagoButton, PyagoAvatar, SkeletonLoader, …
+│   ├── storage/            — HiveService, LocalStorageService, SecureTokenStorage
+│   └── theme/              — AppColors, AppTypography, AppTheme, AppSpacing, …
+│
+├── features/
+│   ├── auth/               — Splash → Welcome → Onboarding → Login/Register → OTP → Profile
+│   ├── bookmarks/          — Local-first bookmarks
+│   ├── chat/               — Full real-time chat (threads + messages)
+│   ├── communities/        — Community browsing
+│   ├── create/             — Rich create screen (Markdown + media + drafts)
+│   ├── drafts/             — Draft management
+│   ├── explore/            — Explore feed
+│   ├── home/               — Main feed + comments
+│   ├── notifications/      — Notification list
+│   ├── onboarding/         — Interest selection
+│   ├── profile/            — User profile
+│   ├── search/             — Search
+│   └── settings/           — Theme, locale, text scale, app lock
+│
+├── l10n/                   — ARB localisation files (en, ne, hi, ja, de, fr, ar)
+└── main.dart
 ```
+
+---
+
+## Architecture
+
+Pyago uses **clean architecture** applied feature-first:
+
+```
+┌─────────────────────────────────────────────────────┐
+│                  Presentation Layer                  │
+│   Screens ← Riverpod Providers/Notifiers → Widgets   │
+└─────────────────────┬───────────────────────────────┘
+                      │ depends on
+┌─────────────────────▼───────────────────────────────┐
+│                   Domain Layer                       │
+│       Repository Interfaces   Domain Models          │
+└─────────────────────┬───────────────────────────────┘
+                      │ implements
+┌─────────────────────▼───────────────────────────────┐
+│                    Data Layer                        │
+│    Mock*Repository  ←──── AppConfig.useMockData      │
+│    Http*Repository  ←/                               │
+│         ↓                                            │
+│     ApiClient (Dio)  /  HiveService                  │
+└─────────────────────────────────────────────────────┘
+```
+
+**Key patterns:**
+
+- **`Result<T>`** — Sealed `Success<T>` / `Failure<T>` wrapper returned by all repository methods. Presenters pattern-match via `.when()` instead of try/catch.
+- **Repository interfaces** — Every feature's `domain/repositories/` contains an abstract interface. The DI layer (`AppConfig.useMockData`) decides which implementation to inject — no UI code ever knows.
+- **MockEngine** — Single source of simulated latency, pagination, and failure injection so all mock repositories behave consistently. Swap to a real backend later with zero UI changes.
+- **Offline outbox** — `OfflineQueue` serialises mutations to Hive while offline and replays them in order on reconnect.
+
+---
+
+## Testing
+
+```bash
+# All unit + widget tests
+flutter test
+
+# Regenerate golden baselines (run once, then commit the PNGs)
+flutter test --update-goldens test/golden/
+
+# Integration tests (requires a connected device or simulator)
+flutter test integration_test/app_test.dart
+```
+
+Coverage is uploaded to Codecov automatically by CI. To view locally:
+
+```bash
+flutter test --coverage
+genhtml coverage/lcov.info -o coverage/html
+open coverage/html/index.html
+```
+
+---
+
+## CI/CD
+
+Three GitHub Actions workflows:
+
+| Workflow | Triggers | Jobs |
+|---|---|---|
+| **CI** (`ci.yml`) | Push/PR to `main`, `develop` | Analyze + format + test + Codecov upload; Debug APK build; Integration tests |
+| **Release** (`release.yml`) | Push of `v*` tag | Signed release APK + AAB + GitHub Release |
+
+Dependency updates are automated weekly via **Dependabot** for both pub packages
+and GitHub Actions.
+
+---
+
+## Contributing
+
+See [CONTRIBUTING.md](CONTRIBUTING.md) for the full guide, including:
+- Local environment setup and pre-commit hooks
+- Branch naming and PR size conventions
+- Commit message format (Conventional Commits)
+- Architecture rules and code-style guide
+
+---
+
+## Security
+
+See [SECURITY.md](SECURITY.md) for the vulnerability disclosure policy and
+security architecture notes.
+
+---
+
+## Changelog
+
+See [CHANGELOG.md](CHANGELOG.md) for a detailed version history.

@@ -1,11 +1,11 @@
 import 'dart:async';
 import 'dart:math';
 
-import '../../../../core/network/mock/mock_engine.dart';
-import '../../../../core/network/pagination.dart';
-import '../../../../core/network/result.dart';
-import '../../domain/models/chat_models.dart';
-import '../../domain/repositories/chat_repository.dart';
+import 'package:pyago/core/network/mock/mock_engine.dart';
+import 'package:pyago/core/network/pagination.dart';
+import 'package:pyago/core/network/result.dart';
+import 'package:pyago/features/chat/domain/models/chat_models.dart';
+import 'package:pyago/features/chat/domain/repositories/chat_repository.dart';
 
 /// Realistic in-memory fake chat backend. Behaves like a real real-time
 /// service would: messages arrive on a `Stream<ChatEvent>` (not polled),

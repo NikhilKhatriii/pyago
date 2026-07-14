@@ -1,0 +1,27 @@
+# flutter_launcher_icons standalone config
+# Run: dart run flutter_launcher_icons
+# This generates the launcher icons for Android and iOS.
+#
+# Prerequisites:
+# 1. Place your 1024x1024 icon at assets/icons/app_icon.png
+# 2. Run: flutter pub get
+# 3. Run: dart run flutter_launcher_icons
+
+flutter_launcher_icons:
+  android: true
+  ios: true
+  image_path: "assets/icons/app_icon.png"
+  min_sdk_android: 21
+
+  # Android 8.0+ adaptive icon
+  # The background fills the full canvas; the foreground is the actual icon
+  # that the launcher may mask (circle, squircle, etc.)
+  adaptive_icon_background: "#5B4EF2"
+  adaptive_icon_foreground: "assets/icons/app_icon.png"
+
+  # iOS
+  remove_alpha_ios: true   # Apple rejects icons with transparency
+
+  # Web (not used yet — set to false)
+  web:
+    generate: false

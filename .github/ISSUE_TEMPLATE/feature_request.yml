@@ -1,0 +1,58 @@
+name: ✨ Feature Request
+description: Suggest a new feature or improvement for Pyago
+labels: ["enhancement", "triage"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for taking the time to suggest an improvement!
+
+  - type: textarea
+    id: problem
+    attributes:
+      label: What problem does this solve?
+      description: |
+        Describe the problem you're trying to solve.
+        "I'm frustrated when..." or "It's hard to..." is a great way to start.
+    validations:
+      required: true
+
+  - type: textarea
+    id: solution
+    attributes:
+      label: Proposed solution
+      description: Describe the feature or change you'd like to see.
+    validations:
+      required: true
+
+  - type: textarea
+    id: alternatives
+    attributes:
+      label: Alternatives considered
+      description: What other approaches did you consider, and why did you prefer this one?
+
+  - type: dropdown
+    id: area
+    attributes:
+      label: Feature area
+      options:
+        - Feed / home
+        - Create / editor
+        - Chat
+        - Communities
+        - Profile
+        - Search
+        - Notifications
+        - Settings / accessibility
+        - Offline support
+        - Performance
+        - Developer experience
+        - Other
+    validations:
+      required: true
+
+  - type: textarea
+    id: context
+    attributes:
+      label: Additional context
+      description: Mockups, references to similar features in other apps, etc.
