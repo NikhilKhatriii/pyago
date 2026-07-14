@@ -34,13 +34,20 @@ final _shellNavigatorKey = GlobalKey<NavigatorState>();
 /// protected route via [redirect]; the bottom-nav shell wraps the five
 /// top-level destinations via [StatefulShellRoute].
 final appRouterProvider = Provider<GoRouter>((ref) {
-  final status = ref.watch(authStatusProvider);
+  final authController = ref.watch(authControllerProvider.notifier);
+  
+  // Create a Listenable that triggers whenever the AuthController state changes.
+  // This is more reliable than listening to a derived provider.
+  final listenable = _StateNotifierListenable(authController);
 
   return GoRouter(
     navigatorKey: _rootNavigatorKey,
     initialLocation: '/splash',
-    debugLogDiagnostics: false,
+    debugLogDiagnostics: true, // Enable logs to help debug navigation
+    refreshListenable: listenable,
     redirect: (context, state) {
+      final authState = ref.read(authControllerProvider);
+      final status = authState.status;
       final loc = state.matchedLocation;
 
       if (status == AuthStatus.unknown) {
@@ -53,6 +60,7 @@ final appRouterProvider = Provider<GoRouter>((ref) {
       };
 
       if (status == AuthStatus.unauthenticated) {
+        // If we just finished loading and are at splash, go to welcome.
         if (loc == '/splash') return '/welcome';
         return publicRoutes.contains(loc) ? null : '/welcome';
       }
@@ -137,3 +145,10 @@ final appRouterProvider = Provider<GoRouter>((ref) {
     ],
   );
 });
+
+/// A simple [Listenable] that triggers when a [StateNotifier] changes.
+class _StateNotifierListenable extends ChangeNotifier {
+  _StateNotifierListenable(StateNotifier notifier) {
+    notifier.addListener((_) => notifyListeners());
+  }
+}

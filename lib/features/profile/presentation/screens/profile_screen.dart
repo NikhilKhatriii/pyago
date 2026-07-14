@@ -107,7 +107,14 @@ class ProfileScreen extends ConsumerWidget {
                             leading: Icon(s.$1),
                             title: Text(s.$2),
                             trailing: const Icon(Icons.chevron_right_rounded),
-                            onTap: () => context.push(s.$3),
+                            onTap: () {
+                              if (s.$3 == '/communities') {
+                                // Switch to the Communities tab in the shell
+                                ref.read(appRouterProvider).go('/communities');
+                              } else {
+                                context.push(s.$3);
+                              }
+                            },
                           ),
                         const SizedBox(height: AppSpacing.xxxl),
                       ],
