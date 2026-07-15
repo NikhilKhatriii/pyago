@@ -16,7 +16,7 @@ flutter_launcher_icons:
   # Android 8.0+ adaptive icon
   # The background fills the full canvas; the foreground is the actual icon
   # that the launcher may mask (circle, squircle, etc.)
-  adaptive_icon_background: "#5B4EF2"
+  adaptive_icon_background: "#FFFFFF"
   adaptive_icon_foreground: "assets/icons/app_icon.png"
 
   # iOS
