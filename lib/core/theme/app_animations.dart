@@ -10,6 +10,12 @@ class AppDurations {
   static const Duration normal = Duration(milliseconds: 250);
   static const Duration slow = Duration(milliseconds: 400);
   static const Duration deliberate = Duration(milliseconds: 600);
+
+  /// Stagger delay between items in cascading list animations.
+  static const Duration stagger = Duration(milliseconds: 80);
+
+  /// Major screen/hero transitions.
+  static const Duration hero = Duration(milliseconds: 500);
 }
 
 class AppCurves {

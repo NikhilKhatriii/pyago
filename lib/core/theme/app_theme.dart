@@ -6,6 +6,10 @@ import 'app_typography.dart';
 
 /// Builds Pyago's Material 3 [ThemeData] for every supported theme mode:
 /// standard light/dark, and high-contrast variants for low-vision users.
+///
+/// The theme is designed for a premium editorial aesthetic: warm
+/// backgrounds, soft borderless cards, pill-shaped buttons, and
+/// a translucent navigation bar.
 class AppTheme {
   const AppTheme._();
 
@@ -94,31 +98,43 @@ class AppTheme {
       splashFactory: InkSparkle.splashFactory,
       visualDensity: VisualDensity.standard,
       dividerColor: border,
+
+      // ── App Bar ──────────────────────────────────────────────────────────
       appBarTheme: AppBarTheme(
         backgroundColor: background,
         foregroundColor: textPrimary,
         elevation: 0,
-        scrolledUnderElevation: highContrast ? 0 : 1,
+        scrolledUnderElevation: highContrast ? 0 : 0.5,
         surfaceTintColor: Colors.transparent,
-        centerTitle: false,
-        titleTextStyle: textTheme.headlineSmall,
+        centerTitle: true,
+        titleTextStyle: textTheme.headlineSmall?.copyWith(
+          fontWeight: FontWeight.w600,
+        ),
       ),
+
+      // ── Cards — borderless with warm shadow ─────────────────────────────
       cardTheme: CardThemeData(
         color: surface,
         elevation: 0,
         shape: RoundedRectangleBorder(
-          borderRadius: AppRadius.radiusMd,
-          side: BorderSide(color: border, width: highContrast ? 1.5 : 1),
+          borderRadius: AppRadius.radiusCard,
+          side: highContrast
+              ? BorderSide(color: border, width: 1.5)
+              : BorderSide.none,
         ),
         margin: EdgeInsets.zero,
       ),
+
+      // ── Chips — pill-shaped with refined styling ────────────────────────
       chipTheme: ChipThemeData(
         backgroundColor: surfaceVariant,
         labelStyle: textTheme.labelMedium,
         shape: RoundedRectangleBorder(borderRadius: AppRadius.radiusPill),
-        side: BorderSide(color: border),
-        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+        side: BorderSide(color: border.withValues(alpha: 0.5)),
+        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
       ),
+
+      // ── Elevated Button — pill-shaped gradient-ready ────────────────────
       elevatedButtonTheme: ElevatedButtonThemeData(
         style: ElevatedButton.styleFrom(
           backgroundColor: primary,
@@ -126,28 +142,36 @@ class AppTheme {
           disabledBackgroundColor: surfaceVariant,
           elevation: 0,
           minimumSize: const Size.fromHeight(52),
-          shape: RoundedRectangleBorder(borderRadius: AppRadius.radiusMd),
-          textStyle: textTheme.labelLarge,
+          shape: RoundedRectangleBorder(borderRadius: AppRadius.radiusPill),
+          textStyle: textTheme.labelLarge?.copyWith(
+            letterSpacing: 0.5,
+          ),
         ),
       ),
+
+      // ── Outlined Button ────────────────────────────────────────────────
       outlinedButtonTheme: OutlinedButtonThemeData(
         style: OutlinedButton.styleFrom(
           foregroundColor: textPrimary,
           minimumSize: const Size.fromHeight(52),
           side: BorderSide(color: border, width: highContrast ? 1.5 : 1),
-          shape: RoundedRectangleBorder(borderRadius: AppRadius.radiusMd),
+          shape: RoundedRectangleBorder(borderRadius: AppRadius.radiusPill),
           textStyle: textTheme.labelLarge,
         ),
       ),
+
+      // ── Text Button ────────────────────────────────────────────────────
       textButtonTheme: TextButtonThemeData(
         style: TextButton.styleFrom(
           foregroundColor: primary,
           textStyle: textTheme.labelLarge,
         ),
       ),
+
+      // ── Input Fields — elegant underline-forward styling ───────────────
       inputDecorationTheme: InputDecorationTheme(
         filled: true,
-        fillColor: surfaceVariant,
+        fillColor: surfaceVariant.withValues(alpha: 0.5),
         contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
         border: OutlineInputBorder(
           borderRadius: AppRadius.radiusMd,
@@ -155,7 +179,7 @@ class AppTheme {
         ),
         enabledBorder: OutlineInputBorder(
           borderRadius: AppRadius.radiusMd,
-          borderSide: BorderSide(color: border),
+          borderSide: BorderSide(color: border.withValues(alpha: 0.6)),
         ),
         focusedBorder: OutlineInputBorder(
           borderRadius: AppRadius.radiusMd,
@@ -168,6 +192,8 @@ class AppTheme {
         hintStyle: textTheme.bodyMedium?.copyWith(color: textSecondary),
         labelStyle: textTheme.bodyMedium?.copyWith(color: textSecondary),
       ),
+
+      // ── Bottom Sheet — frosted glass aesthetic ─────────────────────────
       bottomSheetTheme: BottomSheetThemeData(
         backgroundColor: surface,
         showDragHandle: true,
@@ -175,19 +201,41 @@ class AppTheme {
           borderRadius: BorderRadius.vertical(top: Radius.circular(AppRadius.xl)),
         ),
       ),
+
+      // ── Dialog ─────────────────────────────────────────────────────────
       dialogTheme: DialogThemeData(
         backgroundColor: surface,
         shape: RoundedRectangleBorder(borderRadius: AppRadius.radiusLg),
         titleTextStyle: textTheme.headlineSmall,
         contentTextStyle: textTheme.bodyMedium?.copyWith(color: textSecondary),
       ),
+
+      // ── Navigation Bar — translucent with pill indicator ──────────────
       navigationBarTheme: NavigationBarThemeData(
-        backgroundColor: surface,
-        indicatorColor: primary.withValues(alpha: 0.15),
+        backgroundColor: surface.withValues(alpha: 0.85),
+        indicatorColor: primary.withValues(alpha: 0.12),
         surfaceTintColor: Colors.transparent,
-        labelTextStyle: WidgetStateProperty.all(textTheme.labelSmall),
-        height: 64,
+        labelTextStyle: WidgetStateProperty.resolveWith((states) {
+          if (states.contains(WidgetState.selected)) {
+            return textTheme.labelSmall?.copyWith(
+              color: primary,
+              fontWeight: FontWeight.w700,
+            );
+          }
+          return textTheme.labelSmall?.copyWith(
+            color: textSecondary,
+          );
+        }),
+        iconTheme: WidgetStateProperty.resolveWith((states) {
+          if (states.contains(WidgetState.selected)) {
+            return IconThemeData(color: primary, size: 24);
+          }
+          return IconThemeData(color: textSecondary, size: 22);
+        }),
+        height: 68,
       ),
+
+      // ── Snack Bar ─────────────────────────────────────────────────────
       snackBarTheme: SnackBarThemeData(
         backgroundColor: textPrimary,
         contentTextStyle: textTheme.bodyMedium?.copyWith(
@@ -196,6 +244,8 @@ class AppTheme {
         behavior: SnackBarBehavior.floating,
         shape: RoundedRectangleBorder(borderRadius: AppRadius.radiusSm),
       ),
+
+      // ── Page Transitions ──────────────────────────────────────────────
       pageTransitionsTheme: const PageTransitionsTheme(
         builders: {
           TargetPlatform.android: FadeForwardsPageTransitionsBuilder(),
