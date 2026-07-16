@@ -45,6 +45,8 @@ Pyago is a long-form social writing platform built with Flutter. It is designed 
 | **Localization** | Full `flutter_localizations` + ARB setup for 7 languages (en, ne, hi, ja, de, fr, ar) |
 | **Push notifications** | Scaffolding with tap-to-deep-link, documented for FCM wiring |
 | **Testing** | Unit + widget + golden + integration tests; coverage uploaded to Codecov on every CI run |
+| **Templates (Phase 3)** | Format-aware editor adapting starting content, placeholders, and toolbars per `PostType` |
+| **Collaboration (Phase 3)** | Role-based co-authoring (`coAuthor`, `editor`, `viewer`), invite/accept flows, and permission enforcement |
 
 ---
 
@@ -136,6 +138,15 @@ Switching to a real backend for `staging`/`production` requires **zero UI or
 provider-shape changes** — only a real `Http*Repository` implementation in
 `lib/features/*/data/repositories/` needs to be added, and the single
 `AppConfig.useMockData` branch in the DI layer picks it up.
+
+### Known Limitation: Mock Collaboration Sync
+For Phase 3 (Formal Collaboration), the local-first Hive model handles draft storage. However, true multi-device/multi-account collaboration sync inherently requires a real backend to synchronize mutations between devices. For the `dev`/mock flavor, the collaboration flow (invite -> accept -> shared-edit) can be simulated locally in the same app session to verify UI/UX and permission logic, but true cross-device real-time sync is currently out of scope until the `staging`/`production` HTTP backend is fully implemented.
+
+### Only Human (NO AI) Guarantee
+Pyago offers an explicit product guarantee that all templates, placeholders, and writing prompts are statically authored by human writers. No generative AI is used for per-user content suggestions or text editing assistance.
+
+### Pen Names (Pseudonymity)
+To protect user privacy and support different creative dimensions, Pyago supports multiple personas (Pen Names) under a single account. Users can switch their active persona on their profile page and post anonymously or under their specific pen names without linking their real identity publicly.
 
 ---
 
