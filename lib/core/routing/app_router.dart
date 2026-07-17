@@ -27,6 +27,21 @@ import '../../features/profile/presentation/screens/profile_screen.dart';
 import '../../features/search/presentation/screens/search_screen.dart';
 import '../../features/settings/presentation/screens/settings_screen.dart';
 
+CustomTransitionPage<T> _fadeThrough<T>({required Widget child, required LocalKey key}) {
+  return CustomTransitionPage<T>(
+    key: key,
+    child: child,
+    transitionsBuilder: (context, animation, secondaryAnimation, child) {
+      return SlideTransition(
+        position: Tween(begin: const Offset(0.0, 0.05), end: Offset.zero)
+            .chain(CurveTween(curve: Curves.easeOutCubic))
+            .animate(animation),
+        child: FadeTransition(opacity: animation, child: child),
+      );
+    },
+  );
+}
+
 final _rootNavigatorKey = GlobalKey<NavigatorState>();
 final _shellNavigatorKey = GlobalKey<NavigatorState>();
 
@@ -95,25 +110,52 @@ final appRouterProvider = Provider<GoRouter>((ref) {
       GoRoute(path: '/otp-verification', name: 'otp-verification', builder: (context, state) => const OtpVerificationScreen()),
       GoRoute(path: '/complete-profile', name: 'complete-profile', builder: (context, state) => const CompleteProfileScreen()),
 
-      GoRoute(path: '/search', name: 'search', builder: (context, state) => const SearchScreen()),
-      GoRoute(path: '/notifications', name: 'notifications', builder: (context, state) => const NotificationsScreen()),
-      GoRoute(path: '/settings', name: 'settings', builder: (context, state) => const SettingsScreen()),
-      GoRoute(path: '/chat', name: 'chat', builder: (context, state) => const ChatListScreen()),
+      GoRoute(
+        path: '/search',
+        name: 'search',
+        pageBuilder: (context, state) => _fadeThrough(key: state.pageKey, child: const SearchScreen()),
+      ),
+      GoRoute(
+        path: '/notifications',
+        name: 'notifications',
+        pageBuilder: (context, state) => _fadeThrough(key: state.pageKey, child: const NotificationsScreen()),
+      ),
+      GoRoute(
+        path: '/settings',
+        name: 'settings',
+        pageBuilder: (context, state) => _fadeThrough(key: state.pageKey, child: const SettingsScreen()),
+      ),
+      GoRoute(
+        path: '/chat',
+        name: 'chat',
+        pageBuilder: (context, state) => _fadeThrough(key: state.pageKey, child: const ChatListScreen()),
+      ),
       GoRoute(
         path: '/chat/:threadId',
         name: 'chat-thread',
-        builder: (context, state) => ChatThreadScreen(
-          threadId: state.pathParameters['threadId']!,
-          title: (state.extra as Map?)?['title'] as String? ?? 'Chat',
+        pageBuilder: (context, state) => _fadeThrough(
+          key: state.pageKey,
+          child: ChatThreadScreen(
+            threadId: state.pathParameters['threadId']!,
+            title: (state.extra as Map?)?['title'] as String? ?? 'Chat',
+          ),
         ),
       ),
       GoRoute(
         path: '/post/:id/comments',
         name: 'comments',
-        builder: (context, state) => CommentsScreen(post: state.extra as PostModel),
+        pageBuilder: (context, state) => _fadeThrough(key: state.pageKey, child: CommentsScreen(post: state.extra as PostModel)),
       ),
-      GoRoute(path: '/bookmarks', name: 'bookmarks', builder: (context, state) => const BookmarksScreen()),
-      GoRoute(path: '/drafts', name: 'drafts', builder: (context, state) => const DraftsScreen()),
+      GoRoute(
+        path: '/bookmarks',
+        name: 'bookmarks',
+        pageBuilder: (context, state) => _fadeThrough(key: state.pageKey, child: const BookmarksScreen()),
+      ),
+      GoRoute(
+        path: '/drafts',
+        name: 'drafts',
+        pageBuilder: (context, state) => _fadeThrough(key: state.pageKey, child: const DraftsScreen()),
+      ),
 
       StatefulShellRoute.indexedStack(
         builder: (context, state, navigationShell) => AppShell(navigationShell: navigationShell),
