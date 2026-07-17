@@ -64,3 +64,7 @@ class RateLimitedException extends AppException {
 class SyncFailedException extends AppException {
   const SyncFailedException([super.message = 'Some changes could not be synced.']);
 }
+
+class CollaborationException extends AppException {
+  const CollaborationException(super.message);
+}
