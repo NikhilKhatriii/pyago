@@ -40,4 +40,5 @@ class StorageKeys {
   static const String appLockEnabled = 'pyago.app_lock_enabled';
   static const String recentSearches = 'pyago.recent_searches';
   static const String draftPrefix = 'pyago.draft.';
+  static const String simpleMode = 'pyago.simple_mode';
 }
