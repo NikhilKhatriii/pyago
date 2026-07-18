@@ -29,12 +29,12 @@ class HiveService {
     if (_initialized) return;
     await Hive.initFlutter();
     await Future.wait([
-      Hive.openBox<String>(feedCacheBox),
-      Hive.openBox<String>(draftsBox),
-      Hive.openBox<String>(bookmarksBox),
-      Hive.openBox<String>(profileCacheBox),
-      Hive.openBox<String>(outboxBox),
-      Hive.openBox<String>(chatCacheBox),
+      Hive.openBox<String>(feedCacheBox).then((box) => box.clear()),
+      Hive.openBox<String>(draftsBox).then((box) => box.clear()),
+      Hive.openBox<String>(bookmarksBox).then((box) => box.clear()),
+      Hive.openBox<String>(profileCacheBox).then((box) => box.clear()),
+      Hive.openBox<String>(outboxBox).then((box) => box.clear()),
+      Hive.openBox<String>(chatCacheBox).then((box) => box.clear()),
     ]);
     _initialized = true;
   }
