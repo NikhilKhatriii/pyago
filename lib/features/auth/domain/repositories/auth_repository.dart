@@ -15,4 +15,5 @@ abstract interface class AuthRepository {
   Future<AppUser> completeProfile({required String bio, String? avatarUrl});
   Future<void> logout();
   Future<AppUser?> restoreSession();
+  Future<void> updateUser(AppUser user);
 }
