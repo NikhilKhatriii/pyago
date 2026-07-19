@@ -225,7 +225,7 @@ abstract class AppLocalizations {
   /// No description provided for @feedCaughtUpBody.
   ///
   /// In en, this message translates to:
-  /// **'Pyago shows a little at a time on purpose. More will be here tomorrow.'**
+  /// **'We limit this on purpose — most feeds are built to keep you scrolling. This one isn\'t. More will be here tomorrow.'**
   String get feedCaughtUpBody;
 
   /// No description provided for @feedCaughtUpLoadAnyway.
