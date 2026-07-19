@@ -2,6 +2,7 @@ import 'dart:math';
 import '../../../../core/errors/app_exception.dart';
 import '../../../../core/extensions/string_extensions.dart';
 import '../../domain/models/app_user.dart';
+import '../../domain/models/persona.dart';
 import '../../domain/repositories/auth_repository.dart';
 
 /// In-memory auth implementation used until a real backend is wired up.
@@ -23,11 +24,17 @@ class MockAuthRepository implements AuthRepository {
     if (password.length < 8) {
       throw const AuthException('Incorrect email or password.');
     }
+    final defaultPersona = Persona(
+      id: 'p_default',
+      displayName: email.split('@').first.capitalized,
+      createdAt: DateTime.now(),
+    );
     _currentUser = AppUser(
       id: 'user_${email.hashCode}',
       email: email,
-      displayName: email.split('@').first.capitalized,
       isEmailVerified: true,
+      personas: [defaultPersona],
+      activePersonaId: 'p_default',
     );
     return _currentUser!;
   }
@@ -49,10 +56,16 @@ class MockAuthRepository implements AuthRepository {
     if (displayName.trim().isEmpty) {
       throw const ValidationException('Enter a display name.');
     }
+    final defaultPersona = Persona(
+      id: 'p_default',
+      displayName: displayName.trim(),
+      createdAt: DateTime.now(),
+    );
     _currentUser = AppUser(
       id: 'user_${email.hashCode}',
       email: email,
-      displayName: displayName.trim(),
+      personas: [defaultPersona],
+      activePersonaId: 'p_default',
     );
     return _currentUser!;
   }
@@ -72,15 +85,7 @@ class MockAuthRepository implements AuthRepository {
       throw const ValidationException('Enter the 6-digit code.');
     }
     if (_currentUser != null) {
-      _currentUser = _currentUser!.copyWith();
-      _currentUser = AppUser(
-        id: _currentUser!.id,
-        email: _currentUser!.email,
-        displayName: _currentUser!.displayName,
-        bio: _currentUser!.bio,
-        avatarUrl: _currentUser!.avatarUrl,
-        isEmailVerified: true,
-      );
+      _currentUser = _currentUser!.copyWith(isEmailVerified: true);
     }
   }
 
@@ -104,5 +109,10 @@ class MockAuthRepository implements AuthRepository {
   Future<AppUser?> restoreSession() async {
     await _simulateLatency();
     return _currentUser;
+  }
+
+  @override
+  Future<void> updateUser(AppUser user) async {
+    _currentUser = user;
   }
 }
