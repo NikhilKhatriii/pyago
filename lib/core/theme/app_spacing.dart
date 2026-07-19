@@ -13,6 +13,9 @@ class AppSpacing {
   static const double xxxl = 48;
   static const double huge = 64;
 
-  /// Standard horizontal page padding.
-  static const double pageHorizontal = lg;
+  /// Standard horizontal page padding — wider for editorial breathing room.
+  static const double pageHorizontal = 20;
+
+  /// Vertical gap between major content sections.
+  static const double sectionGap = 40;
 }
