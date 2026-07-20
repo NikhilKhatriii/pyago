@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import '../../../../core/constants/app_constants.dart';
+import '../../../../core/theme/app_colors.dart';
+import '../../../../core/theme/app_radius.dart';
+import '../../../../core/theme/app_typography.dart';
 
 class SplashScreen extends StatelessWidget {
   const SplashScreen({super.key});
@@ -8,38 +11,66 @@ class SplashScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final scheme = Theme.of(context).colorScheme;
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+
     return Scaffold(
-      backgroundColor: scheme.surface,
-      body: Center(
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Container(
-              width: 72,
-              height: 72,
-              decoration: BoxDecoration(
-                color: scheme.primary,
-                borderRadius: BorderRadius.circular(20),
-              ),
-              alignment: Alignment.center,
-              child: Text(
-                'P',
-                style: Theme.of(context).textTheme.displaySmall?.copyWith(color: Colors.white),
-              ),
-            ).animate().scale(duration: 500.ms, curve: Curves.easeOutBack).fadeIn(),
-            const SizedBox(height: 20),
-            Text(
-              AppConstants.appName,
-              style: Theme.of(context).textTheme.headlineMedium,
-            ).animate().fadeIn(delay: 200.ms, duration: 400.ms),
-            const SizedBox(height: 6),
-            Text(
-              AppConstants.tagline,
-              style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                    color: scheme.onSurface.withValues(alpha: 0.6),
-                  ),
-            ).animate().fadeIn(delay: 350.ms, duration: 400.ms),
-          ],
+      body: Container(
+        decoration: BoxDecoration(
+          gradient: LinearGradient(
+            colors: isDark ? AppColors.brandGradientDark : AppColors.brandGradient,
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+          ),
+        ),
+        child: Center(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              // Styled outer card representing premium branding
+              Container(
+                width: 96,
+                height: 96,
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.circular(AppRadius.lg),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.black.withValues(alpha: 0.15),
+                      blurRadius: 24,
+                      offset: const Offset(0, 8),
+                    ),
+                  ],
+                ),
+                padding: const EdgeInsets.all(12),
+                child: Image.asset(
+                  'assets/icons/app_icon.png',
+                  fit: BoxFit.contain,
+                ),
+              )
+                  .animate()
+                  .scale(duration: 600.ms, curve: Curves.easeOutBack)
+                  .fadeIn()
+                  .then(delay: 200.ms)
+                  .shimmer(duration: 1000.ms),
+              const SizedBox(height: 28),
+              Text(
+                AppConstants.appName,
+                style: AppTypography.serifDisplay(
+                  color: Colors.white,
+                  fontSize: 34,
+                  letterSpacing: -1.0,
+                ),
+              ).animate().fadeIn(delay: 250.ms, duration: 500.ms),
+              const SizedBox(height: 8),
+              Text(
+                AppConstants.tagline,
+                style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                      color: Colors.white.withValues(alpha: 0.75),
+                      letterSpacing: 0.5,
+                    ),
+              ).animate().fadeIn(delay: 450.ms, duration: 500.ms),
+            ],
+          ),
         ),
       ),
     );
