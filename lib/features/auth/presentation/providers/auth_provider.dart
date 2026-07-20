@@ -1,6 +1,7 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../data/repositories/mock_auth_repository.dart';
 import '../../domain/models/app_user.dart';
+import '../../domain/models/persona.dart';
 import '../../domain/repositories/auth_repository.dart';
 
 final authRepositoryProvider = Provider<AuthRepository>((ref) => MockAuthRepository());
@@ -91,6 +92,28 @@ class AuthController extends StateNotifier<AuthState> {
   Future<void> logout() async {
     await _repository.logout();
     state = const AuthState(status: AuthStatus.unauthenticated);
+  }
+
+  void switchPersona(String personaId) {
+    if (state.user == null) return;
+    final updatedUser = state.user!.copyWith(activePersonaId: personaId);
+    state = state.copyWith(user: updatedUser);
+    _repository.updateUser(updatedUser);
+  }
+
+  void createPersona({required String displayName, String bio = '', String? avatarUrl}) {
+    if (state.user == null) return;
+    final newPersona = Persona(
+      id: 'persona_${DateTime.now().millisecondsSinceEpoch}',
+      displayName: displayName,
+      bio: bio,
+      avatarUrl: avatarUrl,
+      createdAt: DateTime.now(),
+    );
+    final updatedPersonas = [...state.user!.personas, newPersona];
+    final updatedUser = state.user!.copyWith(personas: updatedPersonas, activePersonaId: newPersona.id);
+    state = state.copyWith(user: updatedUser);
+    _repository.updateUser(updatedUser);
   }
 
   void clearError() {
