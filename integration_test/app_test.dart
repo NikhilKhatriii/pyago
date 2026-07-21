@@ -6,6 +6,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 import 'package:pyago/core/storage/hive_service.dart';
 import 'package:pyago/core/storage/local_storage_service.dart';
+import 'package:pyago/features/auth/domain/models/persona.dart';
 import 'package:pyago/features/auth/domain/models/app_user.dart';
 import 'package:pyago/features/auth/presentation/providers/auth_provider.dart';
 import 'package:pyago/main.dart';
@@ -31,9 +32,21 @@ void main() {
           localStorageProvider.overrideWithValue(LocalStorageService(prefs)),
           hiveServiceProvider.overrideWithValue(HiveService()),
           authControllerProvider.overrideWith((ref) => AuthController(ref.watch(authRepositoryProvider))
-            ..state = const AuthState(
+            ..state = AuthState(
               status: AuthStatus.authenticated,
-              user: AppUser(id: 'u1', email: 'test@pyago.app', displayName: 'Test User'),
+              user: AppUser(
+                id: 'u1',
+                email: 'test@pyago.app',
+                personas: [
+                  Persona(
+                    id: 'p1',
+                    displayName: 'Test User',
+                    bio: '',
+                    createdAt: DateTime.now(),
+                  )
+                ],
+                activePersonaId: 'p1',
+              ),
             )),
         ],
         child: const PyagoApp(),
@@ -60,9 +73,21 @@ void main() {
           localStorageProvider.overrideWithValue(LocalStorageService(prefs)),
           hiveServiceProvider.overrideWithValue(HiveService()),
           authControllerProvider.overrideWith((ref) => AuthController(ref.watch(authRepositoryProvider))
-            ..state = const AuthState(
+            ..state = AuthState(
               status: AuthStatus.authenticated,
-              user: AppUser(id: 'u2', email: 'writer@pyago.app', displayName: 'Writer'),
+              user: AppUser(
+                id: 'u2',
+                email: 'writer@pyago.app',
+                personas: [
+                  Persona(
+                    id: 'p2',
+                    displayName: 'Writer',
+                    bio: '',
+                    createdAt: DateTime.now(),
+                  )
+                ],
+                activePersonaId: 'p2',
+              ),
             )),
         ],
         child: const PyagoApp(),
