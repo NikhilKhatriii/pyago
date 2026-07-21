@@ -1,22 +1,33 @@
+import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:flutter_markdown/flutter_markdown.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 
 import '../../../../core/constants/app_constants.dart';
 import '../../../../core/network/connectivity_service.dart';
 import '../../../../core/shared/widgets/pyago_badge.dart';
+import '../../../../core/theme/app_colors.dart';
+import '../../../../core/theme/app_radius.dart';
 import '../../../../core/theme/app_spacing.dart';
+import '../../../../core/theme/app_typography.dart';
 import '../../../home/domain/models/post_model.dart';
-import '../../data/services/media_pipeline_service.dart';
+import '../../../settings/presentation/providers/settings_provider.dart';
+import '../../data/services/collab_sync_service.dart';
+import '../../domain/models/collaboration_invite.dart';
 import '../../domain/models/draft_model.dart';
+import '../../domain/models/format_collab_policy.dart' hide collabPolicyFor;
 import '../../domain/models/media_attachment.dart';
+import '../../domain/templates/post_template.dart';
+import '../../domain/templates/template_resolver.dart';
+import '../../data/services/media_pipeline_service.dart';
 import '../providers/create_provider.dart';
+import '../providers/collab_presence_provider.dart';
+import '../widgets/collab_presence_bar.dart';
+import '../widgets/collaborator_cursor.dart';
+import '../widgets/suggestion_overlay.dart';
+import '../widgets/story_chapter_list.dart';
 
-/// Pyago's writing surface. Deliberately spare — a small, selection-aware
-/// formatting toolbar and media row sit in a bottom bar so the page
-/// itself stays focused on the words. Works fully offline: drafts and
-/// attachments are saved to local storage regardless of connectivity,
-/// and publishing while offline queues instead of failing.
 class CreateScreen extends ConsumerStatefulWidget {
   const CreateScreen({super.key, this.existingDraft});
 
@@ -31,6 +42,7 @@ class _CreateScreenState extends ConsumerState<CreateScreen> {
   late final TextEditingController _body;
   final _bodyFocusNode = FocusNode();
   bool _previewMode = false;
+  bool _collabSessionActive = false;
 
   @override
   void initState() {
@@ -38,6 +50,8 @@ class _CreateScreenState extends ConsumerState<CreateScreen> {
     if (widget.existingDraft != null) {
       WidgetsBinding.instance.addPostFrameCallback((_) {
         ref.read(createControllerProvider.notifier).loadDraft(widget.existingDraft!);
+        // Auto-connect collab session if this draft has accepted collaborators.
+        _maybeAutoConnect(widget.existingDraft!);
       });
     }
     final DraftModel initialDraft = widget.existingDraft ?? ref.read(createControllerProvider);
@@ -50,7 +64,26 @@ class _CreateScreenState extends ConsumerState<CreateScreen> {
     _title.dispose();
     _body.dispose();
     _bodyFocusNode.dispose();
+    // Disconnect collab session when editor closes.
+    if (_collabSessionActive) {
+      final draft = ref.read(createControllerProvider);
+      ref.read(collabSyncServiceProvider(draft.id).notifier).disconnect();
+    }
     super.dispose();
+  }
+
+  void _maybeAutoConnect(DraftModel draft) {
+    final hasAccepted = draft.collaborators.any((c) => c.status == InviteStatus.accepted);
+    final policy = collabPolicyFor(draft.type);
+    if (hasAccepted && policy.mode == CollabMode.realtime) {
+      _connectCollabSession(draft.id);
+    }
+  }
+
+  void _connectCollabSession(String draftId) {
+    if (_collabSessionActive) return;
+    ref.read(collabSyncServiceProvider(draftId).notifier).connect();
+    setState(() => _collabSessionActive = true);
   }
 
   void _wrapSelection(String prefix, String suffix) {
@@ -65,6 +98,19 @@ class _CreateScreenState extends ConsumerState<CreateScreen> {
       selection: TextSelection.collapsed(offset: end + prefix.length + suffix.length),
     );
     ref.read(createControllerProvider.notifier).updateBody(newText);
+  }
+
+  String _buildGhostText(String text, List<String> hints) {
+    final lines = text.split('\n');
+    final ghostLines = <String>[];
+    for (int i = 0; i < hints.length; i++) {
+      if (i < lines.length && lines[i].isNotEmpty) {
+        ghostLines.add('');
+      } else {
+        ghostLines.add(hints[i]);
+      }
+    }
+    return ghostLines.join('\n');
   }
 
   void _insertLinePrefix(String prefix) {
@@ -83,8 +129,34 @@ class _CreateScreenState extends ConsumerState<CreateScreen> {
   Widget build(BuildContext context) {
     final draft = ref.watch(createControllerProvider);
     final controller = ref.read(createControllerProvider.notifier);
+    final template = templateFor(draft.type);
     final scheme = Theme.of(context).colorScheme;
     final isOnline = ref.watch(isOnlineProvider).value ?? true;
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+
+    // Sync programmatically generated text updates from collaboration
+    ref.listen<DraftModel>(createControllerProvider, (previous, next) {
+      if (next.body != _body.text) {
+        final oldSelection = _body.selection;
+        _body.value = TextEditingValue(
+          text: next.body,
+          selection: oldSelection.copyWith(
+            baseOffset: oldSelection.baseOffset.clamp(0, next.body.length),
+            extentOffset: oldSelection.extentOffset.clamp(0, next.body.length),
+          ),
+        );
+      }
+      if (next.title != _title.text) {
+        final oldSelection = _title.selection;
+        _title.value = TextEditingValue(
+          text: next.title,
+          selection: oldSelection.copyWith(
+            baseOffset: oldSelection.baseOffset.clamp(0, next.title.length),
+            extentOffset: oldSelection.extentOffset.clamp(0, next.title.length),
+          ),
+        );
+      }
+    });
 
     return Scaffold(
       appBar: AppBar(
@@ -92,19 +164,49 @@ class _CreateScreenState extends ConsumerState<CreateScreen> {
           icon: const Icon(Icons.close_rounded),
           onPressed: () => Navigator.of(context).maybePop(),
         ),
-        title: Wrap(
-          spacing: AppSpacing.xs,
-          crossAxisAlignment: WrapCrossAlignment.center,
-          children: [
-            for (final type in PostType.values)
-              PyagoTag(
-                label: type.label,
-                selected: draft.type == type,
-                onTap: () => controller.updateType(type),
-              ),
-          ],
+        title: SingleChildScrollView(
+          scrollDirection: Axis.horizontal,
+          child: Row(
+            children: [
+              for (final type in PostType.values) ...[
+                PyagoTag(
+                  label: type.label,
+                  selected: draft.type == type,
+                  onTap: () {
+                    try {
+                      controller.updateType(type);
+                    } on FormatException catch (_) {
+                      showDialog(
+                        context: context,
+                        builder: (ctx) => AlertDialog(
+                          title: const Text('Change format?'),
+                          content: const Text('This will apply a new template. Your existing text will be kept below it.'),
+                          actions: [
+                            TextButton(onPressed: () => Navigator.pop(ctx), child: const Text('Cancel')),
+                            TextButton(
+                              onPressed: () {
+                                Navigator.pop(ctx);
+                                controller.updateType(type, force: true);
+                              },
+                              child: const Text('Proceed'),
+                            ),
+                          ],
+                        ),
+                      );
+                    }
+                  },
+                ),
+                const SizedBox(width: 6),
+              ],
+            ],
+          ),
         ),
         actions: [
+          IconButton(
+            tooltip: 'Collaboration Settings',
+            icon: const Icon(Icons.people_alt_rounded),
+            onPressed: () => _showSharingSettingsSheet(context, draft, controller),
+          ),
           IconButton(
             tooltip: _previewMode ? 'Edit' : 'Preview',
             icon: Icon(_previewMode ? Icons.edit_outlined : Icons.visibility_outlined),
@@ -123,8 +225,8 @@ class _CreateScreenState extends ConsumerState<CreateScreen> {
             child: const Text('Save draft'),
           ),
           Padding(
-            padding: const EdgeInsets.only(right: AppSpacing.sm),
-            child: FilledButton(
+            padding: const EdgeInsets.only(right: 8),
+            child: TextButton(
               onPressed: draft.body.trim().isEmpty
                   ? null
                   : () async {
@@ -139,7 +241,10 @@ class _CreateScreenState extends ConsumerState<CreateScreen> {
                         ),
                       );
                     },
-              child: const Text('Publish'),
+              child: const Text(
+                'Publish',
+                style: TextStyle(fontWeight: FontWeight.bold),
+              ),
             ),
           ),
         ],
@@ -148,57 +253,47 @@ class _CreateScreenState extends ConsumerState<CreateScreen> {
         children: [
           if (!isOnline) _OfflineNotice(scheme: scheme),
           if (draft.publishState == DraftPublishState.queuedForPublish) _QueuedNotice(scheme: scheme),
+          // Live presence bar — only visible during an active collab session.
+          if (_collabSessionActive)
+            CollabPresenceBar(draftId: draft.id),
+          // Suggestion overlay — shown for coAuthor/owner when editor-role collaborators have pending suggestions.
+          if (_collabSessionActive) ...[            
+            Builder(builder: (ctx) {
+              final suggestions = ref
+                  .watch(collabSyncServiceProvider(draft.id))
+                  .collaborators
+                  .values
+                  .toList();
+              // Only the session service knows pending suggestions.
+              final pendingSuggestions = _collabSessionActive
+                  ? ref.read(collabSyncServiceProvider(draft.id).notifier).pendingSuggestions
+                  : [];
+              return SuggestionOverlay(
+                suggestions: List.from(pendingSuggestions),
+                onAccept: controller.acceptSuggestion,
+                onReject: controller.rejectSuggestion,
+              );
+            }),
+          ],
           Expanded(
             child: _previewMode
                 ? SingleChildScrollView(
                     padding: const EdgeInsets.symmetric(horizontal: AppSpacing.pageHorizontal, vertical: AppSpacing.lg),
-                    child: MarkdownBody(data: draft.body.isEmpty ? '_Nothing to preview yet._' : draft.body),
+                    child: MarkdownBody(data: draft.resolvedBody.isEmpty ? '_Nothing to preview yet._' : draft.resolvedBody),
                   )
-                : SingleChildScrollView(
-                    padding: const EdgeInsets.symmetric(horizontal: AppSpacing.pageHorizontal, vertical: AppSpacing.lg),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        TextField(
-                          controller: _title,
-                          maxLength: AppConstants.maxPostTitleLength,
-                          style: Theme.of(context).textTheme.headlineMedium,
-                          decoration: const InputDecoration(
-                            hintText: 'Title (optional)',
-                            border: InputBorder.none,
-                            counterText: '',
-                            contentPadding: EdgeInsets.zero,
-                            filled: false,
-                          ),
-                          onChanged: controller.updateTitle,
-                        ),
-                        const SizedBox(height: AppSpacing.sm),
-                        TextField(
-                          controller: _body,
-                          focusNode: _bodyFocusNode,
-                          minLines: 10,
-                          maxLines: null,
-                          style: Theme.of(context).textTheme.bodyLarge,
-                          decoration: const InputDecoration(
-                            hintText: 'Start writing… (Markdown supported: **bold**, *italic*, # heading)',
-                            border: InputBorder.none,
-                            contentPadding: EdgeInsets.zero,
-                            filled: false,
-                          ),
-                          onChanged: controller.updateBody,
-                        ),
-                        if (draft.attachments.isNotEmpty) ...[
-                          const SizedBox(height: AppSpacing.md),
-                          _AttachmentGrid(attachments: draft.attachments, controller: controller),
-                        ],
-                      ],
-                    ),
-                  ),
+                : _buildEditorBody(context, draft, template, controller, scheme),
           ),
-          if (!_previewMode) _FormattingToolbar(onWrap: _wrapSelection, onLinePrefix: _insertLinePrefix),
+          if (!_previewMode) _FormattingToolbar(onWrap: _wrapSelection, onLinePrefix: _insertLinePrefix, actions: template.enabledToolbarActions),
           Container(
             padding: const EdgeInsets.symmetric(horizontal: AppSpacing.lg, vertical: AppSpacing.sm),
-            decoration: BoxDecoration(border: Border(top: BorderSide(color: scheme.outline))),
+            decoration: BoxDecoration(
+              color: isDark ? AppColors.darkSurface : Colors.white,
+              border: Border(
+                top: BorderSide(
+                  color: scheme.outline.withValues(alpha: 0.15),
+                ),
+              ),
+            ),
             child: Row(
               children: [
                 IconButton(
@@ -237,6 +332,130 @@ class _CreateScreenState extends ConsumerState<CreateScreen> {
     );
   }
 
+  Widget _buildEditorBody(
+    BuildContext context,
+    DraftModel draft,
+    PostTemplate template,
+    CreateController controller,
+    ColorScheme scheme,
+  ) {
+    final editorContent = SingleChildScrollView(
+      padding: const EdgeInsets.symmetric(horizontal: AppSpacing.pageHorizontal, vertical: AppSpacing.lg),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          TextField(
+            controller: _title,
+            maxLength: AppConstants.maxPostTitleLength,
+            style: AppTypography.serifDisplay(
+              color: scheme.onSurface,
+              fontSize: 26,
+            ),
+            decoration: InputDecoration(
+              hintText: template.requiresTitle ? 'Title (required)' : 'Title (optional)',
+              border: InputBorder.none,
+              counterText: '',
+              contentPadding: EdgeInsets.zero,
+              filled: false,
+            ),
+            onChanged: controller.updateTitle,
+          ),
+          const SizedBox(height: AppSpacing.sm),
+          LayoutBuilder(
+            builder: (context, constraints) {
+              final textStyle = AppTypography.displaySerif(
+                color: scheme.onSurface,
+                fontSize: 16,
+              );
+              final textPainter = TextPainter(
+                text: TextSpan(text: draft.body, style: textStyle),
+                textDirection: TextDirection.ltr,
+              )..layout(maxWidth: constraints.maxWidth);
+
+              final collabState = _collabSessionActive
+                  ? ref.watch(collabSyncServiceProvider(draft.id))
+                  : null;
+              final listCollabs = collabState?.collaborators.values.toList() ?? [];
+
+              return Stack(
+                children: [
+                  Positioned.fill(
+                    child: Padding(
+                      padding: EdgeInsets.zero,
+                      child: Text(
+                        _buildGhostText(draft.body, template.placeholderHints),
+                        style: textStyle.copyWith(
+                          color: scheme.onSurface.withOpacity(0.3),
+                          fontStyle: FontStyle.italic,
+                        ),
+                      ),
+                    ),
+                  ),
+                  TextField(
+                    controller: _body,
+                    focusNode: _bodyFocusNode,
+                    minLines: 12,
+                    maxLines: null,
+                    style: textStyle,
+                    decoration: const InputDecoration(
+                      border: InputBorder.none,
+                      contentPadding: EdgeInsets.zero,
+                      filled: false,
+                    ),
+                    onChanged: (val) {
+                      controller.updateBody(val);
+                      if (_collabSessionActive) {
+                        ref
+                            .read(collabSyncServiceProvider(draft.id).notifier)
+                            .reportCursorMoved(_body.selection.baseOffset);
+                      }
+                    },
+                    onTap: () {
+                      if (_collabSessionActive) {
+                        ref
+                            .read(collabSyncServiceProvider(draft.id).notifier)
+                            .reportCursorMoved(_body.selection.baseOffset);
+                      }
+                    },
+                  ),
+                  if (_collabSessionActive && listCollabs.isNotEmpty)
+                    Positioned.fill(
+                      child: CollaboratorCursorOverlay(
+                        collaborators: listCollabs,
+                        textPainter: textPainter,
+                        textTopLeft: Offset.zero,
+                      ),
+                    ),
+                ],
+              );
+            },
+          ),
+          if (draft.attachments.isNotEmpty) ...[
+            const SizedBox(height: AppSpacing.md),
+            _AttachmentGrid(attachments: draft.attachments, controller: controller),
+          ],
+        ],
+      ),
+    );
+
+    // Story + collab: wrap with chapter list panel.
+    if (draft.type == PostType.story && _collabSessionActive && draft.blocks.isNotEmpty) {
+      return Row(
+        children: [
+          StoryChapterList(
+            draftId: draft.id,
+            blocks: draft.blocks,
+            onChapterTap: (_) {}, // TODO: scroll to block
+            onAddChapter: () {}, // TODO: add chapter block
+          ),
+          Expanded(child: editorContent),
+        ],
+      );
+    }
+
+    return editorContent;
+  }
+
   Future<void> _showVoiceRecorderSheet(BuildContext context, CreateController controller) async {
     final pipeline = ref.read(mediaPipelineServiceProvider);
     await pipeline.startRecording();
@@ -252,7 +471,7 @@ class _CreateScreenState extends ConsumerState<CreateScreen> {
             const SizedBox(height: 12),
             const Text('Recording…'),
             const SizedBox(height: 20),
-            FilledButton.icon(
+            ElevatedButton.icon(
               icon: const Icon(Icons.stop_circle_outlined),
               label: const Text('Stop & attach'),
               onPressed: () async {
@@ -264,6 +483,32 @@ class _CreateScreenState extends ConsumerState<CreateScreen> {
           ],
         ),
       ),
+    );
+  }
+
+  void _showSharingSettingsSheet(
+    BuildContext context,
+    DraftModel draft,
+    CreateController controller,
+  ) {
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+      builder: (ctx) {
+        return _SharingSettingsSheet(
+          draft: draft,
+          controller: controller,
+          collabSessionActive: _collabSessionActive,
+          onStartSession: () {
+            Navigator.pop(ctx);
+            _connectCollabSession(draft.id);
+            ScaffoldMessenger.of(context).showSnackBar(
+              const SnackBar(content: Text('Collaborative session started')),
+            );
+          },
+        );
+      },
     );
   }
 }
@@ -283,8 +528,6 @@ class _AttachmentGrid extends StatelessWidget {
   }
 }
 
-/// A simple drag-reorderable row of attachment thumbnails with inline
-/// upload progress and a remove button per item.
 class _ReorderableWrap extends StatelessWidget {
   const _ReorderableWrap({required this.attachments, required this.onReorder, required this.onRemove});
 
@@ -365,23 +608,38 @@ class _AttachmentTile extends StatelessWidget {
 }
 
 class _FormattingToolbar extends StatelessWidget {
-  const _FormattingToolbar({required this.onWrap, required this.onLinePrefix});
+  const _FormattingToolbar({required this.onWrap, required this.onLinePrefix, required this.actions});
   final void Function(String prefix, String suffix) onWrap;
   final void Function(String prefix) onLinePrefix;
+  final Set<ToolbarAction> actions;
 
   @override
   Widget build(BuildContext context) {
-    return SingleChildScrollView(
-      scrollDirection: Axis.horizontal,
-      padding: const EdgeInsets.symmetric(horizontal: AppSpacing.sm),
-      child: Row(
-        children: [
-          IconButton(icon: const Icon(Icons.format_bold), tooltip: 'Bold', onPressed: () => onWrap('**', '**')),
-          IconButton(icon: const Icon(Icons.format_italic), tooltip: 'Italic', onPressed: () => onWrap('*', '*')),
-          IconButton(icon: const Icon(Icons.title), tooltip: 'Heading', onPressed: () => onLinePrefix('## ')),
-          IconButton(icon: const Icon(Icons.format_list_bulleted), tooltip: 'List', onPressed: () => onLinePrefix('- ')),
-          IconButton(icon: const Icon(Icons.format_quote), tooltip: 'Blockquote', onPressed: () => onLinePrefix('> ')),
-        ],
+    final scheme = Theme.of(context).colorScheme;
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+
+    return Container(
+      color: isDark ? AppColors.darkSurface : Colors.white,
+      padding: const EdgeInsets.symmetric(vertical: 4),
+      child: SingleChildScrollView(
+        scrollDirection: Axis.horizontal,
+        padding: const EdgeInsets.symmetric(horizontal: AppSpacing.sm),
+        child: Row(
+          children: [
+            if (actions.contains(ToolbarAction.bold))
+              IconButton(icon: const Icon(Icons.format_bold), tooltip: 'Bold', onPressed: () => onWrap('**', '**')),
+            if (actions.contains(ToolbarAction.italic))
+              IconButton(icon: const Icon(Icons.format_italic), tooltip: 'Italic', onPressed: () => onWrap('*', '*')),
+            if (actions.contains(ToolbarAction.heading))
+              IconButton(icon: const Icon(Icons.title), tooltip: 'Heading', onPressed: () => onLinePrefix('## ')),
+            if (actions.contains(ToolbarAction.list))
+              IconButton(icon: const Icon(Icons.format_list_bulleted), tooltip: 'List', onPressed: () => onLinePrefix('- ')),
+            if (actions.contains(ToolbarAction.quote))
+              IconButton(icon: const Icon(Icons.format_quote), tooltip: 'Blockquote', onPressed: () => onLinePrefix('> ')),
+            if (actions.contains(ToolbarAction.sceneBreak))
+              IconButton(icon: const Icon(Icons.horizontal_rule), tooltip: 'Scene Break', onPressed: () => onLinePrefix('---\n')),
+          ],
+        ),
       ),
     );
   }
@@ -401,8 +659,12 @@ class _OfflineNotice extends StatelessWidget {
         children: [
           Icon(Icons.cloud_off_rounded, size: 16, color: scheme.onTertiaryContainer),
           const SizedBox(width: 8),
-          Text("You're offline — this will save and publish automatically once you're back online.",
-              style: TextStyle(fontSize: 12, color: scheme.onTertiaryContainer)),
+          Expanded(
+            child: Text(
+              'Working offline — changes saved locally',
+              style: Theme.of(context).textTheme.bodySmall?.copyWith(color: scheme.onTertiaryContainer),
+            ),
+          ),
         ],
       ),
     );
@@ -421,11 +683,266 @@ class _QueuedNotice extends StatelessWidget {
       padding: const EdgeInsets.symmetric(horizontal: AppSpacing.pageHorizontal, vertical: 8),
       child: Row(
         children: [
-          SizedBox(width: 14, height: 14, child: CircularProgressIndicator(strokeWidth: 2, color: scheme.onSecondaryContainer)),
+          Icon(Icons.schedule_rounded, size: 16, color: scheme.onSecondaryContainer),
           const SizedBox(width: 8),
-          Text('Will publish when back online', style: TextStyle(fontSize: 12, color: scheme.onSecondaryContainer)),
+          Expanded(
+            child: Text(
+              'Queued for publish — will sync when online',
+              style: Theme.of(context).textTheme.bodySmall?.copyWith(color: scheme.onSecondaryContainer),
+            ),
+          ),
         ],
       ),
+    );
+  }
+}
+
+class _SharingSettingsSheet extends ConsumerWidget {
+  const _SharingSettingsSheet({
+    required this.draft,
+    required this.controller,
+    required this.collabSessionActive,
+    required this.onStartSession,
+  });
+
+  final DraftModel draft;
+  final CreateController controller;
+  final bool collabSessionActive;
+  final VoidCallback onStartSession;
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final scheme = Theme.of(context).colorScheme;
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final syncService = collabSessionActive
+        ? ref.read(collabSyncServiceProvider(draft.id).notifier)
+        : null;
+    final isSimulating = syncService?.isSimulating ?? false;
+
+    final policy = collabPolicyFor(draft.type);
+
+    return DraggableScrollableSheet(
+      initialChildSize: 0.7,
+      maxChildSize: 0.9,
+      minChildSize: 0.5,
+      builder: (context, scrollController) {
+        return Container(
+          decoration: BoxDecoration(
+            color: isDark ? AppColors.darkSurface : Colors.white,
+            borderRadius: const BorderRadius.vertical(top: Radius.circular(24)),
+          ),
+          padding: const EdgeInsets.all(24),
+          child: ListView(
+            controller: scrollController,
+            children: [
+              // Title & Close
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Text(
+                    'Private Share & Collab',
+                    style: AppTypography.serifDisplay(
+                      color: scheme.onSurface,
+                      fontSize: 24,
+                    ),
+                  ),
+                  IconButton(
+                    icon: const Icon(Icons.close_rounded),
+                    onPressed: () => Navigator.pop(context),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 12),
+              const Text(
+                'Only users you invite can view and edit this collaborative entry. All formatting options and editing changes sync in real-time.',
+                style: TextStyle(color: Colors.grey, height: 1.4),
+              ),
+              const Divider(height: 32),
+
+              // Format Policy Card
+              Text(
+                'COLLABORATION POLICY',
+                style: Theme.of(context).textTheme.labelSmall?.copyWith(
+                      color: scheme.primary,
+                      fontWeight: FontWeight.bold,
+                      letterSpacing: 1.0,
+                    ),
+              ),
+              const SizedBox(height: 8),
+              Container(
+                padding: const EdgeInsets.all(16),
+                decoration: BoxDecoration(
+                  color: scheme.primary.withOpacity(0.06),
+                  borderRadius: BorderRadius.circular(16),
+                  border: Border.all(color: scheme.primary.withOpacity(0.12)),
+                ),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Row(
+                      children: [
+                        Icon(Icons.menu_book_rounded, color: scheme.primary, size: 20),
+                        const SizedBox(width: 8),
+                        Text(
+                          '${draft.type.label} Collaboration Rules',
+                          style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 8),
+                    Text(
+                      policy.collabDescription,
+                      style: TextStyle(color: scheme.onSurfaceVariant, fontSize: 13, height: 1.4),
+                    ),
+                  ],
+                ),
+              ),
+
+              const Divider(height: 32),
+
+              // Simulated Peer Co-Writer
+              Text(
+                'CO-WRITER SIMULATOR',
+                style: Theme.of(context).textTheme.labelSmall?.copyWith(
+                      color: scheme.primary,
+                      fontWeight: FontWeight.bold,
+                      letterSpacing: 1.0,
+                    ),
+              ),
+              const SizedBox(height: 8),
+              if (!collabSessionActive) ...[
+                const Text(
+                  'Please start the collaborative session first to simulate co-writers.',
+                  style: TextStyle(color: Colors.grey, fontSize: 13, fontStyle: FontStyle.italic),
+                ),
+                const SizedBox(height: 12),
+                ElevatedButton.icon(
+                  onPressed: onStartSession,
+                  icon: const Icon(Icons.play_arrow_rounded),
+                  label: const Text('Start Collab Session'),
+                ),
+              ] else ...[
+                Container(
+                  padding: const EdgeInsets.all(16),
+                  decoration: BoxDecoration(
+                    color: Colors.amber.withOpacity(0.06),
+                    borderRadius: BorderRadius.circular(16),
+                    border: Border.all(color: Colors.amber.withOpacity(0.2)),
+                  ),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      const Row(
+                        children: [
+                          Icon(Icons.bolt, color: Colors.amber, size: 22),
+                          SizedBox(width: 8),
+                          Text(
+                            'Simulate Real-Time Typing',
+                            style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 6),
+                      const Text(
+                        'Watch Maya Osei type a collaborative entry into this journal character-by-character live!',
+                        style: TextStyle(color: Colors.grey, fontSize: 13, height: 1.3),
+                      ),
+                      const SizedBox(height: 14),
+                      StatefulBuilder(
+                        builder: (context, setSheetState) {
+                          final liveSync = ref.read(collabSyncServiceProvider(draft.id).notifier);
+                          final active = liveSync.isSimulating;
+
+                          return ElevatedButton(
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: active ? Colors.redAccent : scheme.primary,
+                              foregroundColor: Colors.white,
+                              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                            ),
+                            onPressed: () {
+                              if (active) {
+                                liveSync.stopRealTimeCollabSimulation();
+                              } else {
+                                liveSync.startRealTimeCollabSimulation();
+                              }
+                              setSheetState(() {});
+                            },
+                            child: Text(active ? 'Stop Simulation' : 'Start Simulation'),
+                          );
+                        },
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+
+              const Divider(height: 32),
+
+              // Collaborators list
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Text(
+                    'COLLABORATORS (${draft.collaborators.length + 1})',
+                    style: Theme.of(context).textTheme.labelSmall?.copyWith(
+                          color: scheme.primary,
+                          fontWeight: FontWeight.bold,
+                          letterSpacing: 1.0,
+                        ),
+                  ),
+                  TextButton.icon(
+                    onPressed: () {
+                      controller.inviteCollaborator('mock_invitee_${DateTime.now().millisecondsSinceEpoch}', CollaboratorRole.coAuthor);
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(content: Text('Invited new co-author')),
+                      );
+                    },
+                    icon: const Icon(Icons.add, size: 16),
+                    label: const Text('Invite'),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 8),
+              // Owner
+              ListTile(
+                contentPadding: EdgeInsets.zero,
+                leading: const Icon(Icons.person_rounded),
+                title: const Text('You (Owner)'),
+                subtitle: const Text('Role: Co-Author'),
+                trailing: Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                  decoration: BoxDecoration(
+                    color: Colors.green.withOpacity(0.12),
+                    borderRadius: BorderRadius.circular(4),
+                  ),
+                  child: const Text('Active', style: TextStyle(color: Colors.green, fontSize: 11, fontWeight: FontWeight.bold)),
+                ),
+              ),
+              // Invites
+              for (final c in draft.collaborators)
+                ListTile(
+                  contentPadding: EdgeInsets.zero,
+                  leading: const Icon(Icons.people_outline_rounded),
+                  title: Text(c.inviteeUserId.contains('mock') ? 'Maya Osei' : c.inviteeUserId),
+                  subtitle: Text('Role: ${c.role.name}'),
+                  trailing: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Text(c.status.name, style: const TextStyle(fontSize: 12, fontStyle: FontStyle.italic)),
+                      if (c.status == InviteStatus.pending) ...[
+                        const SizedBox(width: 8),
+                        IconButton(
+                          icon: const Icon(Icons.check, color: Colors.green, size: 20),
+                          onPressed: () => controller.acceptInvite(c.id),
+                        ),
+                      ],
+                    ],
+                  ),
+                ),
+            ],
+          ),
+        );
+      },
     );
   }
 }
