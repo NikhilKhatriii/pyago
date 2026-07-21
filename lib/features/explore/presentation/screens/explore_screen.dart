@@ -5,6 +5,7 @@ import '../../../../core/shared/widgets/error_state.dart';
 import '../../../../core/shared/widgets/pyago_badge.dart';
 import '../../../../core/shared/widgets/skeleton_loader.dart';
 import '../../../../core/theme/app_spacing.dart';
+import '../../../../core/theme/app_typography.dart';
 import '../../../home/presentation/providers/home_provider.dart';
 import '../../../home/presentation/widgets/post_card.dart';
 import '../../../home/domain/models/post_model.dart';
@@ -18,19 +19,30 @@ class ExploreScreen extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final feed = ref.watch(feedControllerProvider);
     final filter = ref.watch(_exploreFilterProvider);
+    final scheme = Theme.of(context).colorScheme;
 
     return Scaffold(
-      appBar: AppBar(title: const Text('Explore')),
+      appBar: AppBar(
+        title: Text(
+          'Explore',
+          style: AppTypography.serifDisplay(
+            color: scheme.onSurface,
+            fontSize: 26,
+          ),
+        ),
+      ),
       body: Column(
         children: [
+          const SizedBox(height: 8),
+          // Category pills
           SizedBox(
-            height: 48,
+            height: 38,
             child: ListView(
               scrollDirection: Axis.horizontal,
               padding: const EdgeInsets.symmetric(horizontal: AppSpacing.pageHorizontal),
               children: [
                 PyagoTag(
-                  label: 'All',
+                  label: 'All Experiences',
                   selected: filter == null,
                   onTap: () => ref.read(_exploreFilterProvider.notifier).state = null,
                 ),
@@ -46,7 +58,7 @@ class ExploreScreen extends ConsumerWidget {
               ],
             ),
           ),
-          const SizedBox(height: AppSpacing.sm),
+          const SizedBox(height: 16),
           Expanded(
             child: Builder(builder: (context) {
               if (feed.isInitialLoading) {
@@ -62,19 +74,21 @@ class ExploreScreen extends ConsumerWidget {
                 );
               }
               final filtered = filter == null ? feed.posts : feed.posts.where((p) => p.type == filter).toList();
-              return ListView(
+              return ListView.builder(
                 padding: const EdgeInsets.fromLTRB(
                   AppSpacing.pageHorizontal, 0, AppSpacing.pageHorizontal, AppSpacing.xxxl,
                 ),
-                children: [
-                  for (final post in filtered)
-                    PostCard(
-                      post: post,
-                      onResonate: () => ref.read(feedControllerProvider.notifier).toggleResonance(post.id),
-                      onBookmark: () => ref.read(feedControllerProvider.notifier).toggleBookmark(post.id),
-                      onOpen: () => context.push('/post/${post.id}/comments', extra: post),
-                    ),
-                ],
+                itemCount: filtered.length,
+                itemBuilder: (context, index) {
+                  final post = filtered[index];
+                  return PostCard(
+                    post: post,
+                    index: index + 1,
+                    onResonate: () => ref.read(feedControllerProvider.notifier).toggleResonance(post.id),
+                    onBookmark: () => ref.read(feedControllerProvider.notifier).toggleBookmark(post.id),
+                    onOpen: () => context.push('/post/${post.id}/comments', extra: post),
+                  );
+                },
               );
             }),
           ),
