@@ -190,7 +190,7 @@ final appRouterProvider = Provider<GoRouter>((ref) {
 
 /// A simple [Listenable] that triggers when a [StateNotifier] changes.
 class _StateNotifierListenable extends ChangeNotifier {
-  _StateNotifierListenable(StateNotifier notifier) {
-    notifier.addListener((_) => notifyListeners());
+  _StateNotifierListenable(dynamic notifier) {
+    (notifier as StateNotifier).addListener((_) => notifyListeners());
   }
 }
