@@ -123,6 +123,8 @@ class MockFeedRepository implements FeedRepository {
     required String body,
     required PostType type,
     required int readingTimeMinutes,
+    List<String>? authorIds,
+    List<String>? authorNames,
   }) async {
     await _engine.latency(multiplier: 1.2);
     try {
@@ -132,7 +134,8 @@ class MockFeedRepository implements FeedRepository {
     }
     final post = PostModel(
       id: 'p_${DateTime.now().microsecondsSinceEpoch}',
-      authorName: 'You',
+      authorIds: authorIds ?? const ['mock_user_id'],
+      authorNames: authorNames ?? const ['You'],
       type: type,
       title: title.isEmpty ? null : title,
       content: body,
@@ -193,6 +196,8 @@ class MockFeedRepository implements FeedRepository {
       ('thought', null, 'Grief is just love that ran out of places to go, for a while.'),
       ('article', 'The discipline of finishing small things',
           'Momentum is not a feeling you wait for. It is a residue left behind by starting anyway.'),
+      ('story', 'The Architect\'s Dream',
+          'He built houses with doors that opened into other cities. The first time she turned the handle, she smelled salt water.\n\n---\n\nShe never returned to the mainland.'),
       ('image', 'Morning walk, unedited', 'A photo from a walk before the city woke up.'),
     ];
 
@@ -201,7 +206,8 @@ class MockFeedRepository implements FeedRepository {
       final type = PostType.values.firstWhere((t) => t.name == typeStr);
       return PostModel(
         id: 'p${i + 1}',
-        authorName: authors[i % authors.length],
+        authorIds: ['u${i % authors.length}'],
+        authorNames: [authors[i % authors.length]],
         type: type,
         title: title,
         content: content,
