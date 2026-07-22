@@ -1,6 +1,6 @@
 import 'package:equatable/equatable.dart';
 
-enum PostType { thought, poetry, journal, article, voice, image, video }
+enum PostType { thought, poetry, journal, article, story, voice, image, video }
 
 extension PostTypeX on PostType {
   String get label => switch (this) {
@@ -8,6 +8,7 @@ extension PostTypeX on PostType {
         PostType.poetry => 'Poetry',
         PostType.journal => 'Journal',
         PostType.article => 'Article',
+        PostType.story => 'Story',
         PostType.voice => 'Voice',
         PostType.image => 'Image',
         PostType.video => 'Video',
@@ -17,7 +18,8 @@ extension PostTypeX on PostType {
 class PostModel extends Equatable {
   const PostModel({
     required this.id,
-    required this.authorName,
+    required this.authorIds,
+    required this.authorNames,
     required this.type,
     required this.content,
     this.title,
@@ -30,8 +32,11 @@ class PostModel extends Equatable {
   });
 
   final String id;
-  final String authorName;
+  final List<String> authorIds;
+  final List<String> authorNames;
   final String? authorAvatarUrl;
+
+  String get authorName => authorNames.join(' & ');
   final PostType type;
   final String? title;
   final String content;
@@ -44,7 +49,8 @@ class PostModel extends Equatable {
   PostModel copyWith({int? resonanceCount, bool? isBookmarked, int? commentCount}) {
     return PostModel(
       id: id,
-      authorName: authorName,
+      authorIds: authorIds,
+      authorNames: authorNames,
       authorAvatarUrl: authorAvatarUrl,
       type: type,
       title: title,
@@ -59,7 +65,8 @@ class PostModel extends Equatable {
 
   Map<String, dynamic> toJson() => {
         'id': id,
-        'authorName': authorName,
+        'authorIds': authorIds,
+        'authorNames': authorNames,
         'authorAvatarUrl': authorAvatarUrl,
         'type': type.name,
         'title': title,
@@ -71,9 +78,14 @@ class PostModel extends Equatable {
         'createdAt': createdAt.toIso8601String(),
       };
 
-  factory PostModel.fromJson(Map<String, dynamic> json) => PostModel(
+  factory PostModel.fromJson(Map<String, dynamic> json) {
+    final names = (json['authorNames'] as List<dynamic>?)?.cast<String>() ??
+        (json['authorName'] != null ? [json['authorName'] as String] : []);
+    final ids = (json['authorIds'] as List<dynamic>?)?.cast<String>() ?? [];
+    return PostModel(
         id: json['id'] as String,
-        authorName: json['authorName'] as String,
+        authorIds: ids,
+        authorNames: names,
         authorAvatarUrl: json['authorAvatarUrl'] as String?,
         type: PostType.values.byName(json['type'] as String),
         title: json['title'] as String?,
@@ -84,8 +96,9 @@ class PostModel extends Equatable {
         isBookmarked: json['isBookmarked'] as bool? ?? false,
         createdAt: DateTime.parse(json['createdAt'] as String),
       );
+  }
 
   @override
   List<Object?> get props =>
-      [id, authorName, type, title, content, resonanceCount, commentCount, isBookmarked];
+      [id, authorIds, authorNames, type, title, content, resonanceCount, commentCount, isBookmarked];
 }
