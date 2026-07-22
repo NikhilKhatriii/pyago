@@ -31,5 +31,7 @@ abstract interface class FeedRepository {
     required String body,
     required PostType type,
     required int readingTimeMinutes,
+    List<String>? authorIds,
+    List<String>? authorNames,
   });
 }
