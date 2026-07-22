@@ -3,8 +3,14 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import '../../../../core/routing/app_router.dart';
 import '../../../../core/shared/widgets/pyago_avatar.dart';
+import '../../../../core/shared/widgets/stat_pill.dart';
+import '../../../../core/theme/app_colors.dart';
+import '../../../../core/theme/app_radius.dart';
 import '../../../../core/theme/app_spacing.dart';
+import '../../../../core/theme/app_typography.dart';
 import '../../../auth/presentation/providers/auth_provider.dart';
+import '../../../auth/domain/models/persona.dart';
+import '../../../auth/domain/models/app_user.dart';
 
 class ProfileScreen extends ConsumerWidget {
   const ProfileScreen({super.key});
@@ -13,11 +19,13 @@ class ProfileScreen extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final user = ref.watch(authControllerProvider).user;
     final scheme = Theme.of(context).colorScheme;
+    final isDark = Theme.of(context).brightness == Brightness.dark;
 
     final stats = [
-      ('Pieces', '24'),
-      ('Communities', '5'),
-      ('Resonances', '1.2k'),
+      ('Words', '142k'),
+      ('Minutes', '840'),
+      ('Collections', '12'),
+      ('Followers', '28k'),
     ];
 
     final sections = [
@@ -31,18 +39,33 @@ class ProfileScreen extends ConsumerWidget {
     return Scaffold(
       body: CustomScrollView(
         slivers: [
+          // ── Premium Profile Cover Header ──────────────────────────────────
           SliverAppBar(
-            expandedHeight: 200,
+            expandedHeight: 220,
             pinned: true,
+            leading: const SizedBox.shrink(), // Remove back button on main shell tab
             flexibleSpace: FlexibleSpaceBar(
-              background: Container(
-                decoration: BoxDecoration(
-                  gradient: LinearGradient(
-                    colors: [scheme.primary.withValues(alpha: 0.85), scheme.primary],
-                    begin: Alignment.topLeft,
-                    end: Alignment.bottomRight,
+              background: Stack(
+                fit: StackFit.expand,
+                children: [
+                  Image.asset(
+                    'assets/images/welcome_bg.png',
+                    fit: BoxFit.cover,
                   ),
-                ),
+                  Container(
+                    decoration: BoxDecoration(
+                      gradient: LinearGradient(
+                        colors: [
+                          Colors.transparent,
+                          Colors.black.withValues(alpha: 0.2),
+                          Colors.black.withValues(alpha: 0.7),
+                        ],
+                        begin: Alignment.topCenter,
+                        end: Alignment.bottomCenter,
+                      ),
+                    ),
+                  ),
+                ],
               ),
             ),
           ),
@@ -52,75 +75,120 @@ class ProfileScreen extends ConsumerWidget {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
+                  // ── Avatar Floating Alignment ─────────────────────────────
                   Transform.translate(
-                    offset: const Offset(0, -36),
+                    offset: const Offset(0, -48),
                     child: Row(
                       crossAxisAlignment: CrossAxisAlignment.end,
                       children: [
                         Container(
-                          padding: const EdgeInsets.all(3),
-                          decoration: BoxDecoration(color: scheme.surface, shape: BoxShape.circle),
+                          padding: const EdgeInsets.all(4),
+                          decoration: BoxDecoration(
+                            color: scheme.surface,
+                            shape: BoxShape.circle,
+                          ),
                           child: PyagoAvatar(
                             name: user?.displayName ?? 'You',
                             imageUrl: user?.avatarUrl,
                             size: PyagoAvatarSize.xl,
+                            showGradientRing: true,
                           ),
                         ),
                         const Spacer(),
-                        OutlinedButton(
+                        IconButton(
+                          icon: const Icon(Icons.switch_account_outlined),
+                          tooltip: 'Switch Pen Name',
+                          onPressed: user == null ? null : () => _showPersonaSwitcher(context, ref, user),
+                        ),
+                        const SizedBox(width: 8),
+                        ElevatedButton(
                           onPressed: () => context.push('/complete-profile'),
-                          child: const Text('Edit profile'),
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: scheme.primary,
+                            minimumSize: const Size(120, 42),
+                          ),
+                          child: const Text('Edit Profile'),
                         ),
                       ],
                     ),
                   ),
                   Transform.translate(
-                    offset: const Offset(0, -24),
+                    offset: const Offset(0, -32),
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Text(user?.displayName ?? 'Your name', style: Theme.of(context).textTheme.headlineSmall),
-                        const SizedBox(height: 4),
                         Text(
-                          user != null && user.bio.isNotEmpty ? user.bio : 'No bio yet — tell people what you write about.',
+                          user?.displayName ?? 'Julian Vance',
+                          style: AppTypography.serifDisplay(
+                            color: scheme.onSurface,
+                            fontSize: 32,
+                          ),
+                        ),
+                        const SizedBox(height: 8),
+                        Text(
+                          user != null && user.bio.isNotEmpty
+                              ? user.bio
+                              : 'Architect of words and digital curator. Exploring the intersection of human philosophy and architectural minimalism.',
                           style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                                 color: scheme.onSurface.withValues(alpha: 0.65),
+                                height: 1.5,
                               ),
                         ),
-                        const SizedBox(height: AppSpacing.lg),
-                        Row(
+                        const SizedBox(height: AppSpacing.xl),
+
+                        // ── Stat Pill Grid ──────────────────────────────────
+                        GridView.count(
+                          shrinkWrap: true,
+                          physics: const NeverScrollableScrollPhysics(),
+                          crossAxisCount: 2,
+                          childAspectRatio: 2.2,
+                          crossAxisSpacing: 12,
+                          mainAxisSpacing: 12,
+                          padding: EdgeInsets.zero,
                           children: [
                             for (final s in stats)
-                              Padding(
-                                padding: const EdgeInsets.only(right: AppSpacing.xl),
-                                child: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    Text(s.$2, style: Theme.of(context).textTheme.titleLarge),
-                                    Text(s.$1, style: Theme.of(context).textTheme.bodySmall),
-                                  ],
-                                ),
+                              StatPill(
+                                value: s.$2,
+                                label: s.$1,
                               ),
                           ],
                         ),
-                        const SizedBox(height: AppSpacing.lg),
+                        const SizedBox(height: AppSpacing.xl),
                         const Divider(),
+                        const SizedBox(height: AppSpacing.sm),
+
+                        // ── Action Sections ─────────────────────────────────
                         for (final s in sections)
-                          ListTile(
-                            contentPadding: EdgeInsets.zero,
-                            leading: Icon(s.$1),
-                            title: Text(s.$2),
-                            trailing: const Icon(Icons.chevron_right_rounded),
-                            onTap: () {
-                              if (s.$3 == '/communities') {
-                                // Switch to the Communities tab in the shell
-                                ref.read(appRouterProvider).go('/communities');
-                              } else {
-                                context.push(s.$3);
-                              }
-                            },
+                          Container(
+                            margin: const EdgeInsets.only(bottom: 8),
+                            decoration: BoxDecoration(
+                              color: isDark ? AppColors.darkSurface : Colors.white,
+                              borderRadius: BorderRadius.circular(AppRadius.md),
+                              boxShadow: [
+                                BoxShadow(
+                                  color: scheme.primary.withValues(alpha: 0.03),
+                                  blurRadius: 10,
+                                  offset: const Offset(0, 2),
+                                ),
+                              ],
+                            ),
+                            child: ListTile(
+                              leading: Icon(s.$1, color: scheme.primary),
+                              title: Text(
+                                s.$2,
+                                style: const TextStyle(fontWeight: FontWeight.bold),
+                              ),
+                              trailing: Icon(Icons.chevron_right_rounded, color: scheme.onSurface.withValues(alpha: 0.4)),
+                              onTap: () {
+                                if (s.$3 == '/communities') {
+                                  ref.read(appRouterProvider).go('/communities');
+                                } else {
+                                  context.push(s.$3);
+                                }
+                              },
+                            ),
                           ),
-                        const SizedBox(height: AppSpacing.xxxl),
+                        const SizedBox(height: AppSpacing.huge),
                       ],
                     ),
                   ),
@@ -130,6 +198,127 @@ class ProfileScreen extends ConsumerWidget {
           ),
         ],
       ),
+    );
+  }
+
+  void _showPersonaSwitcher(BuildContext context, WidgetRef ref, AppUser user) {
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      builder: (context) {
+        final scheme = Theme.of(context).colorScheme;
+        return Padding(
+          padding: EdgeInsets.only(
+            bottom: MediaQuery.of(context).viewInsets.bottom,
+            top: 24,
+            left: 16,
+            right: 16,
+          ),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              Text(
+                'Pen Names',
+                style: AppTypography.serifDisplay(
+                  color: scheme.onSurface,
+                  fontSize: 22,
+                ),
+              ),
+              const SizedBox(height: 8),
+              Text(
+                'Publish anonymously under different personas. Real identities are never linked.',
+                style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                      color: scheme.onSurface.withValues(alpha: 0.6),
+                    ),
+              ),
+              const SizedBox(height: 16),
+              Flexible(
+                child: ListView.builder(
+                  shrinkWrap: true,
+                  itemCount: user.personas.length,
+                  itemBuilder: (context, index) {
+                    final p = user.personas[index];
+                    final isActive = p.id == user.activePersonaId;
+                    return ListTile(
+                      leading: PyagoAvatar(name: p.displayName, imageUrl: p.avatarUrl),
+                      title: Text(p.displayName, style: const TextStyle(fontWeight: FontWeight.bold)),
+                      subtitle: Text(p.bio.isNotEmpty ? p.bio : 'No bio yet'),
+                      trailing: isActive ? Icon(Icons.check_circle, color: scheme.primary) : null,
+                      onTap: () {
+                        ref.read(authControllerProvider.notifier).switchPersona(p.id);
+                        Navigator.pop(context);
+                      },
+                    );
+                  },
+                ),
+              ),
+              const Divider(height: 24),
+              ListTile(
+                leading: Icon(Icons.add_circle_outline_rounded, color: scheme.primary),
+                title: const Text('Create new Pen Name', style: TextStyle(fontWeight: FontWeight.bold)),
+                onTap: () {
+                  Navigator.pop(context);
+                  _showCreatePersonaDialog(context, ref);
+                },
+              ),
+              const SizedBox(height: 24),
+            ],
+          ),
+        );
+      },
+    );
+  }
+
+  void _showCreatePersonaDialog(BuildContext context, WidgetRef ref) {
+    final nameCtrl = TextEditingController();
+    final bioCtrl = TextEditingController();
+    showDialog(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          title: const Text('New Pen Name'),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              TextField(
+                controller: nameCtrl,
+                decoration: const InputDecoration(
+                  labelText: 'Pen Name',
+                  hintText: 'e.g. Silas Thorne',
+                ),
+              ),
+              const SizedBox(height: 16),
+              TextField(
+                controller: bioCtrl,
+                decoration: const InputDecoration(
+                  labelText: 'Bio (optional)',
+                  hintText: 'A short description...',
+                ),
+              ),
+            ],
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(context),
+              child: const Text('Cancel'),
+            ),
+            ElevatedButton(
+              onPressed: () {
+                final name = nameCtrl.text.trim();
+                if (name.isNotEmpty) {
+                  ref.read(authControllerProvider.notifier).createPersona(
+                        displayName: name,
+                        bio: bioCtrl.text.trim(),
+                      );
+                  Navigator.pop(context);
+                }
+              },
+              child: const Text('Create'),
+            ),
+          ],
+        );
+      },
     );
   }
 }
