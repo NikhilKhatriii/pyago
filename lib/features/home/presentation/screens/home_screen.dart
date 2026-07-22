@@ -18,6 +18,7 @@ import '../../../../l10n/app_localizations.dart';
 import '../../../auth/presentation/providers/auth_provider.dart';
 import '../providers/home_provider.dart';
 import '../widgets/post_card.dart';
+import '../../domain/models/post_model.dart';
 
 class HomeScreen extends ConsumerWidget {
   const HomeScreen({super.key});
@@ -200,7 +201,7 @@ class HomeScreen extends ConsumerWidget {
     );
   }
 
-  Widget _buildFeaturedHero(BuildContext context, dynamic post, dynamic controller) {
+  Widget _buildFeaturedHero(BuildContext context, PostModel post, FeedController controller) {
     final scheme = Theme.of(context).colorScheme;
     return GestureDetector(
       onTap: () => context.push('/post/${post.id}/comments', extra: post),
@@ -271,7 +272,7 @@ class HomeScreen extends ConsumerWidget {
     );
   }
 
-  Widget _buildContinuingJourney(BuildContext context, dynamic post, dynamic controller) {
+  Widget _buildContinuingJourney(BuildContext context, PostModel post, FeedController controller) {
     final scheme = Theme.of(context).colorScheme;
     final isDark = Theme.of(context).brightness == Brightness.dark;
 
