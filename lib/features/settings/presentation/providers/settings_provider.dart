@@ -10,6 +10,7 @@ class SettingsState {
     this.textScale = 1.0,
     this.locale = 'en',
     this.appLockEnabled = false,
+    this.simpleMode = false,
   });
 
   final ThemeMode themeMode;
@@ -20,6 +21,7 @@ class SettingsState {
   /// Off by default per the security-hardening requirement — the user
   /// must explicitly opt in from Settings.
   final bool appLockEnabled;
+  final bool simpleMode;
 
   SettingsState copyWith({
     ThemeMode? themeMode,
@@ -27,6 +29,7 @@ class SettingsState {
     double? textScale,
     String? locale,
     bool? appLockEnabled,
+    bool? simpleMode,
   }) {
     return SettingsState(
       themeMode: themeMode ?? this.themeMode,
@@ -34,6 +37,7 @@ class SettingsState {
       textScale: textScale ?? this.textScale,
       locale: locale ?? this.locale,
       appLockEnabled: appLockEnabled ?? this.appLockEnabled,
+      simpleMode: simpleMode ?? this.simpleMode,
     );
   }
 }
@@ -49,6 +53,7 @@ class SettingsController extends StateNotifier<SettingsState> {
           textScale: _storage.getDouble(StorageKeys.textScale) ?? 1.0,
           locale: _storage.getString(StorageKeys.locale) ?? 'en',
           appLockEnabled: _storage.getBool(StorageKeys.appLockEnabled) ?? false,
+          simpleMode: _storage.getBool(StorageKeys.simpleMode) ?? false,
         ));
 
   final LocalStorageService _storage;
@@ -76,6 +81,11 @@ class SettingsController extends StateNotifier<SettingsState> {
   Future<void> setAppLockEnabled(bool value) async {
     state = state.copyWith(appLockEnabled: value);
     await _storage.setBool(StorageKeys.appLockEnabled, value);
+  }
+
+  Future<void> setSimpleMode(bool value) async {
+    state = state.copyWith(simpleMode: value);
+    await _storage.setBool(StorageKeys.simpleMode, value);
   }
 }
 
