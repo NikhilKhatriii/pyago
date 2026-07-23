@@ -18,7 +18,7 @@ class RecentSearchesController extends StateNotifier<List<String>> {
   Future<void> add(String query) async {
     final trimmed = query.trim();
     if (trimmed.isEmpty) return;
-    final next = [trimmed, ...state.where((q) => q != trimmed)].take(10).toList();
+    final next = <String>[trimmed, ...state.where((q) => q != trimmed)].take(10).toList();
     state = next;
     await _storage.setStringList(StorageKeys.recentSearches, next);
   }
