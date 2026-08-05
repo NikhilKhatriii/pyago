@@ -67,7 +67,7 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get feedCaughtUpBody =>
-      'يعرض بياغو القليل في كل مرة عن قصد. سيتوفر المزيد غدًا.';
+      'لقد قمنا بالحد من هذا عن قصد — معظم الخلاصات مصممة لتبقيك تتصفح باستمرار. هذه الخلاصة ليست كذلك. سيتوفر المزيد غدًا.';
 
   @override
   String get feedCaughtUpLoadAnyway => 'عرض المزيد على أي حال';
