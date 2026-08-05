@@ -23,7 +23,7 @@
   "feedTitleToday": "今日のおすすめ",
   "feedSeeAll": "すべて見る",
   "feedCaughtUpTitle": "今日はここまでです",
-  "feedCaughtUpBody": "Pyagoはあえて少しずつ表示しています。続きはまた明日。",
+  "feedCaughtUpBody": "意図的に制限しています。ほとんどのフィードはスクロールし続けさせるように作られていますが、このフィードは違います。明日また更新されます。",
   "feedCaughtUpLoadAnyway": "それでももう少し見る",
   "feedEmptyTitle": "まだ表示できる投稿がありません",
   "feedEmptyBody": "作家やコミュニティをフォローすると、ここが少しずつ埋まっていきます。",
