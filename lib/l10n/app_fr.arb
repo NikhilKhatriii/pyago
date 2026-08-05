@@ -23,7 +23,7 @@
   "feedTitleToday": "Pour aujourd'hui",
   "feedSeeAll": "Tout voir",
   "feedCaughtUpTitle": "Vous êtes à jour pour aujourd'hui",
-  "feedCaughtUpBody": "Pyago affiche volontairement peu de contenu à la fois. Il y en aura plus demain.",
+  "feedCaughtUpBody": "Nous limitons cela exprès — la plupart des flux sont conçus pour vous faire défiler indéfiniment. Pas celui-ci. Il y en aura plus demain.",
   "feedCaughtUpLoadAnyway": "Afficher un peu plus quand même",
   "feedEmptyTitle": "Rien n'a encore été sélectionné",
   "feedEmptyBody": "Suivez quelques auteurs ou communautés, cet espace commencera à se remplir.",
