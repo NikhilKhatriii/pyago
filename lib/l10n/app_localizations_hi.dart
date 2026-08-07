@@ -67,7 +67,7 @@ class AppLocalizationsHi extends AppLocalizations {
 
   @override
   String get feedCaughtUpBody =>
-      'प्यागो जानबूझकर थोड़ा-थोड़ा दिखाता है। कल और सामग्री यहाँ होगी।';
+      'हम इसे जानबूझकर सीमित करते हैं — अधिकांश फ़ीड्स आपको स्क्रॉल कराते रहने के लिए बनाए गए हैं। यह वैसा नहीं है। कल यहाँ और होगा।';
 
   @override
   String get feedCaughtUpLoadAnyway => 'फिर भी थोड़ा और दिखाएँ';
