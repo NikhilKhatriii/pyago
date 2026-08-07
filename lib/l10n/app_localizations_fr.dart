@@ -67,7 +67,7 @@ class AppLocalizationsFr extends AppLocalizations {
 
   @override
   String get feedCaughtUpBody =>
-      'Pyago affiche volontairement peu de contenu à la fois. Il y en aura plus demain.';
+      'Nous limitons cela exprès — la plupart des flux sont conçus pour vous faire défiler indéfiniment. Pas celui-ci. Il y en aura plus demain.';
 
   @override
   String get feedCaughtUpLoadAnyway => 'Afficher un peu plus quand même';
