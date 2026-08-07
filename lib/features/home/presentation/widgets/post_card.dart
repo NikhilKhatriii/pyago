@@ -6,6 +6,8 @@ import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_radius.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
+import 'package:flutter_linkify/flutter_linkify.dart';
+import 'package:url_launcher/url_launcher.dart';
 import '../../domain/models/post_model.dart';
 
 class PostCard extends StatelessWidget {
@@ -81,10 +83,8 @@ class PostCard extends StatelessWidget {
                   ),
                   const SizedBox(height: 10),
                 ],
-                Text(
-                  post.content,
-                  maxLines: isLongForm ? 3 : 5,
-                  overflow: TextOverflow.ellipsis,
+                Linkify(
+                  text: post.content,
                   style: isLongForm
                       ? Theme.of(context).textTheme.bodyMedium?.copyWith(
                             color: scheme.onSurface.withValues(alpha: 0.75),
@@ -94,6 +94,17 @@ class PostCard extends StatelessWidget {
                           color: scheme.onSurface,
                           fontSize: 16,
                         ),
+                  onOpen: (link) async {
+                    // Open URLs in external browser
+                    await launchUrl(Uri.parse(link.url));
+                  },
+                  options: const LinkifyOptions(
+                    humanize: false,
+                  ),
+                  linkifiers: const [
+                    UrlLinkifier(),
+                    // Custom linkifiers for hashtags and mentions can be added here
+                  ],
                 ),
                 const SizedBox(height: 20),
                 // Read Experience CTA
