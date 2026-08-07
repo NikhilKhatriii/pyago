@@ -67,7 +67,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get feedCaughtUpBody =>
-      'Pyago shows a little at a time on purpose. More will be here tomorrow.';
+      'We limit this on purpose — most feeds are built to keep you scrolling. This one isn\'t. More will be here tomorrow.';
 
   @override
   String get feedCaughtUpLoadAnyway => 'Show a bit more anyway';
