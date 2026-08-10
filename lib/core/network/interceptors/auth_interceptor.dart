@@ -1,6 +1,6 @@
 import 'package:dio/dio.dart';
-import '../../storage/secure_token_storage.dart';
-import '../../errors/app_exception.dart';
+import 'package:pyago/core/errors/app_exception.dart';
+import 'package:pyago/core/storage/secure_token_storage.dart';
 
 /// Attaches the bearer token to every request, and on a 401 transparently
 /// refreshes the token and retries the original request exactly once.
