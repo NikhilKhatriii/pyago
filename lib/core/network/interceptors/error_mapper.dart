@@ -1,5 +1,5 @@
 import 'package:dio/dio.dart';
-import '../../errors/app_exception.dart';
+import 'package:pyago/core/errors/app_exception.dart';
 
 /// Central place that turns transport-level errors (Dio, sockets, JSON
 /// parsing) into the [AppException] hierarchy the rest of the app
