@@ -1,7 +1,7 @@
 import 'dart:math';
-import '../../config/app_config.dart';
-import '../../errors/app_exception.dart';
-import '../pagination.dart';
+import 'package:pyago/core/config/app_config.dart';
+import 'package:pyago/core/errors/app_exception.dart';
+import 'package:pyago/core/network/pagination.dart';
 
 /// Shared behavior for every `Mock*Repository`, so the "fake backend"
 /// behaves consistently like a real one would: network-ish latency,
