@@ -1,15 +1,14 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_test/flutter_test.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter_test/flutter_test.dart';
 import 'package:integration_test/integration_test.dart';
-import 'package:shared_preferences/shared_preferences.dart';
-
 import 'package:pyago/core/storage/hive_service.dart';
 import 'package:pyago/core/storage/local_storage_service.dart';
-import 'package:pyago/features/auth/domain/models/persona.dart';
 import 'package:pyago/features/auth/domain/models/app_user.dart';
+import 'package:pyago/features/auth/domain/models/persona.dart';
 import 'package:pyago/features/auth/presentation/providers/auth_provider.dart';
 import 'package:pyago/main.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 /// Critical-path smoke test: with a pre-authenticated session, every
 /// bottom-nav destination should open without error. This intentionally
