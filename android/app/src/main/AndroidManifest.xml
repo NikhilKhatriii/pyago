@@ -20,7 +20,8 @@
     <application
         android:label="Pyago"
         android:name="${applicationName}"
-        android:icon="@mipmap/ic_launcher">
+        android:icon="@drawable/ic_pyago_logo"
+        android:roundIcon="@drawable/ic_pyago_logo">
         <activity
             android:name=".MainActivity"
             android:exported="true"
