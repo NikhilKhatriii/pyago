@@ -1,7 +1,8 @@
 import 'dart:async';
+
 import 'package:dio/dio.dart';
-import '../connectivity_service.dart';
-import '../../errors/app_exception.dart';
+import 'package:pyago/core/errors/app_exception.dart';
+import 'package:pyago/core/network/connectivity_service.dart';
 
 /// Retries idempotent GETs with exponential backoff on transient
 /// failures (timeouts, connection errors, 5xx), and short-circuits
