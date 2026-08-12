@@ -1,4 +1,4 @@
-import '../errors/app_exception.dart';
+import 'package:pyago/core/errors/app_exception.dart';
 
 /// Typed success/failure wrapper. Repositories that talk to the network
 /// layer prefer returning `Result<T>` over throwing so callers are forced
