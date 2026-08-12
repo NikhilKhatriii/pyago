@@ -1,31 +1,33 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import '../shared/app_shell.dart';
-import '../../features/auth/presentation/providers/auth_provider.dart';
-import '../../features/auth/presentation/screens/complete_profile_screen.dart';
-import '../../features/auth/presentation/screens/forgot_password_screen.dart';
-import '../../features/auth/presentation/screens/login_screen.dart';
-import '../../features/auth/presentation/screens/onboarding_screen.dart';
-import '../../features/auth/presentation/screens/otp_verification_screen.dart';
-import '../../features/auth/presentation/screens/register_screen.dart';
-import '../../features/auth/presentation/screens/splash_screen.dart';
-import '../../features/auth/presentation/screens/welcome_screen.dart';
-import '../../features/bookmarks/presentation/screens/bookmarks_screen.dart';
-import '../../features/chat/presentation/screens/chat_list_screen.dart';
-import '../../features/communities/presentation/screens/communities_screen.dart';
-import '../../features/create/presentation/screens/create_screen.dart';
-import '../../features/create/domain/models/draft_model.dart';
-import '../../features/drafts/presentation/screens/drafts_screen.dart';
-import '../../features/explore/presentation/screens/explore_screen.dart';
-import '../../features/home/presentation/screens/home_screen.dart';
-import '../../features/home/presentation/screens/comments_screen.dart';
-import '../../features/home/domain/models/post_model.dart';
-import '../../features/chat/presentation/screens/chat_thread_screen.dart';
-import '../../features/notifications/presentation/screens/notifications_screen.dart';
-import '../../features/profile/presentation/screens/profile_screen.dart';
-import '../../features/search/presentation/screens/search_screen.dart';
-import '../../features/settings/presentation/screens/settings_screen.dart';
+import 'package:pyago/core/shared/app_shell.dart';
+import 'package:pyago/features/auth/presentation/providers/auth_provider.dart';
+import 'package:pyago/features/auth/presentation/screens/complete_profile_screen.dart';
+import 'package:pyago/features/auth/presentation/screens/forgot_password_screen.dart';
+import 'package:pyago/features/auth/presentation/screens/login_screen.dart';
+import 'package:pyago/features/auth/presentation/screens/onboarding_screen.dart';
+import 'package:pyago/features/auth/presentation/screens/otp_verification_screen.dart';
+import 'package:pyago/features/auth/presentation/screens/register_screen.dart';
+import 'package:pyago/features/auth/presentation/screens/splash_screen.dart';
+import 'package:pyago/features/auth/presentation/screens/welcome_screen.dart';
+import 'package:pyago/features/bookmarks/presentation/screens/bookmarks_screen.dart';
+import 'package:pyago/features/chat/presentation/screens/chat_list_screen.dart';
+import 'package:pyago/features/chat/presentation/screens/chat_thread_screen.dart';
+import 'package:pyago/features/communities/presentation/screens/community_detail_screen.dart';
+import 'package:pyago/features/communities/presentation/screens/communities_screen.dart';
+import 'package:pyago/features/create/domain/models/draft_model.dart';
+import 'package:pyago/features/create/presentation/screens/create_screen.dart';
+import 'package:pyago/features/create/presentation/screens/live_lounge_screen.dart';
+import 'package:pyago/features/drafts/presentation/screens/drafts_screen.dart';
+import 'package:pyago/features/explore/presentation/screens/explore_screen.dart';
+import 'package:pyago/features/home/domain/models/post_model.dart';
+import 'package:pyago/features/home/presentation/screens/comments_screen.dart';
+import 'package:pyago/features/home/presentation/screens/home_screen.dart';
+import 'package:pyago/features/notifications/presentation/screens/notifications_screen.dart';
+import 'package:pyago/features/profile/presentation/screens/profile_screen.dart';
+import 'package:pyago/features/search/presentation/screens/search_screen.dart';
+import 'package:pyago/features/settings/presentation/screens/settings_screen.dart';
 
 CustomTransitionPage<T> _fadeThrough<T>({required Widget child, required LocalKey key}) {
   return CustomTransitionPage<T>(
@@ -152,6 +154,11 @@ final appRouterProvider = Provider<GoRouter>((ref) {
         pageBuilder: (context, state) => _fadeThrough(key: state.pageKey, child: const BookmarksScreen()),
       ),
       GoRoute(
+        path: '/lounge',
+        name: 'lounge',
+        pageBuilder: (context, state) => _fadeThrough(key: state.pageKey, child: const LiveLoungeScreen()),
+      ),
+      GoRoute(
         path: '/drafts',
         name: 'drafts',
         pageBuilder: (context, state) => _fadeThrough(key: state.pageKey, child: const DraftsScreen()),
@@ -177,7 +184,22 @@ final appRouterProvider = Provider<GoRouter>((ref) {
             ],
           ),
           StatefulShellBranch(
-            routes: [GoRoute(path: '/communities', name: 'communities', builder: (context, state) => const CommunitiesScreen())],
+            routes: [
+              GoRoute(
+                path: '/communities',
+                name: 'communities',
+                builder: (context, state) => const CommunitiesScreen(),
+                routes: [
+                  GoRoute(
+                    path: ':id',
+                    name: 'community_detail',
+                    builder: (context, state) => CommunityDetailScreen(
+                      communityId: state.pathParameters['id']!,
+                    ),
+                  ),
+                ],
+              ),
+            ],
           ),
           StatefulShellBranch(
             routes: [GoRoute(path: '/profile', name: 'profile', builder: (context, state) => const ProfileScreen())],
