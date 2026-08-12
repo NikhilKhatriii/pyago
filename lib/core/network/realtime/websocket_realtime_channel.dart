@@ -1,7 +1,8 @@
 import 'dart:async';
 import 'dart:convert';
+
+import 'package:pyago/core/network/realtime/realtime_transport.dart';
 import 'package:web_socket_channel/web_socket_channel.dart';
-import 'realtime_transport.dart';
 
 /// Production implementation of [RealtimeChannel] backed by a real
 /// WebSocket. Not used while `AppConfig.useMockData` is true — wire it
