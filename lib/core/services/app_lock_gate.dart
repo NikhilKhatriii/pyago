@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import '../services/biometric_service.dart';
-import '../../features/settings/presentation/providers/settings_provider.dart';
-import '../../l10n/app_localizations.dart';
+import 'package:pyago/core/services/biometric_service.dart';
+import 'package:pyago/features/settings/presentation/providers/settings_provider.dart';
+import 'package:pyago/l10n/app_localizations.dart';
 
 /// Sits above the router in the widget tree. When App Lock is enabled
 /// (off by default — see Settings), shows an opaque lock screen on cold
