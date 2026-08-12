@@ -1,10 +1,10 @@
 import 'dart:async';
 import 'dart:convert';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:uuid/uuid.dart';
 
-import '../storage/hive_service.dart';
-import 'connectivity_service.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:pyago/core/network/connectivity_service.dart';
+import 'package:pyago/core/storage/hive_service.dart';
+import 'package:uuid/uuid.dart';
 
 /// A single queued mutation waiting for connectivity — e.g. "publish
 /// this post". Stored as JSON in the `outbox` Hive box so it survives
