@@ -1,7 +1,8 @@
 import 'dart:convert';
-import 'package:flutter_secure_storage/flutter_secure_storage.dart';
+
 import 'package:crypto/crypto.dart';
-import '../../features/home/domain/models/post_model.dart';
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
+import 'package:pyago/features/home/domain/models/post_model.dart';
 
 /// Service responsible for generating a C2PA-style content credential manifest for a published post.
 class ContentCredentialService {
