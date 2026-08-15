@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'pyago_button.dart';
+import 'package:pyago/core/shared/widgets/pyago_button.dart';
 
 class PyagoEmptyState extends StatelessWidget {
   const PyagoEmptyState({
