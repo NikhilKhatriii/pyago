@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'pyago_button.dart';
+import 'package:pyago/core/shared/widgets/pyago_button.dart';
 
 class PyagoErrorState extends StatelessWidget {
   const PyagoErrorState({super.key, required this.message, this.onRetry});
