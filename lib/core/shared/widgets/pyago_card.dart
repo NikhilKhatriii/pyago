@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
-import '../../theme/app_elevation.dart';
-import '../../theme/app_radius.dart';
-import '../../theme/app_spacing.dart';
+import 'package:pyago/core/theme/app_elevation.dart';
+import 'package:pyago/core/theme/app_radius.dart';
+import 'package:pyago/core/theme/app_spacing.dart';
 
 /// Generic content card used for posts, list rows, and grouped settings.
 ///
