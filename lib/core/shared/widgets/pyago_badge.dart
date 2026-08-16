@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import '../../theme/app_radius.dart';
+import 'package:pyago/core/theme/app_radius.dart';
 
 class PyagoTag extends StatelessWidget {
   const PyagoTag({super.key, required this.label, this.selected = false, this.onTap});
