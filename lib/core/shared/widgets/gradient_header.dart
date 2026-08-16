@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import '../../theme/app_colors.dart';
+import 'package:pyago/core/theme/app_colors.dart';
 
 /// Reusable premium gradient header background with optional child content.
 /// Frequently used for editorial headers, profile screens, and feature intros.
