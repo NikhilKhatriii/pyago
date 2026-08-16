@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import '../../theme/app_animations.dart';
-import '../../theme/app_colors.dart';
-import '../../theme/app_elevation.dart';
-import '../../theme/app_radius.dart';
+import 'package:pyago/core/theme/app_animations.dart';
+import 'package:pyago/core/theme/app_colors.dart';
+import 'package:pyago/core/theme/app_elevation.dart';
+import 'package:pyago/core/theme/app_radius.dart';
 
 enum PyagoButtonVariant { primary, secondary, tertiary, destructive, gradient }
 enum PyagoButtonSize { medium, large }
