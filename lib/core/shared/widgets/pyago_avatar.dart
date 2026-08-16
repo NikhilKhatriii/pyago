@@ -1,7 +1,7 @@
-import 'package:flutter/material.dart';
 import 'package:cached_network_image/cached_network_image.dart';
-import '../../extensions/string_extensions.dart';
-import '../../theme/app_colors.dart';
+import 'package:flutter/material.dart';
+import 'package:pyago/core/extensions/string_extensions.dart';
+import 'package:pyago/core/theme/app_colors.dart';
 
 enum PyagoAvatarSize { xs, sm, md, lg, xl }
 
