@@ -1,8 +1,8 @@
-import 'package:flutter/material.dart';
 import 'package:flutter/cupertino.dart';
-import 'app_colors.dart';
-import 'app_radius.dart';
-import 'app_typography.dart';
+import 'package:flutter/material.dart';
+import 'package:pyago/core/theme/app_colors.dart';
+import 'package:pyago/core/theme/app_radius.dart';
+import 'package:pyago/core/theme/app_typography.dart';
 
 /// Builds Pyago's Material 3 [ThemeData] for every supported theme mode:
 /// standard light/dark, and high-contrast variants for low-vision users.
