@@ -1,9 +1,9 @@
 import 'dart:math';
-import '../../../../core/errors/app_exception.dart';
-import '../../../../core/extensions/string_extensions.dart';
-import '../../domain/models/app_user.dart';
-import '../../domain/models/persona.dart';
-import '../../domain/repositories/auth_repository.dart';
+import 'package:pyago/core/errors/app_exception.dart';
+import 'package:pyago/core/extensions/string_extensions.dart';
+import 'package:pyago/features/auth/domain/models/app_user.dart';
+import 'package:pyago/features/auth/domain/models/persona.dart';
+import 'package:pyago/features/auth/domain/repositories/auth_repository.dart';
 
 /// In-memory auth implementation used until a real backend is wired up.
 /// It mimics network latency and validation so the UI and providers
