@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:pyago/core/theme/app_colors.dart';
+import 'package:pyago/core/theme/app_radius.dart';
 import 'package:shimmer/shimmer.dart';
-import '../../theme/app_colors.dart';
-import '../../theme/app_radius.dart';
 
 /// A shimmering placeholder block, used while content is loading so the
 /// layout doesn't jump once real data arrives. Overridden with warm tones
